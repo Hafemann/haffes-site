@@ -155,44 +155,73 @@
     let cart = [];
     let currentProduct = null;
 
-    // ===== CARREGA PRODUTOS VIA CSV =====
-    async function loadProducts() {
-      try {
-        // URL CSV da planilha - SUBSTITUA O ID AQUI
-        const SHEETS_URL = "https://docs.google.com/spreadsheets/d/1mepco27k4xrhePSJg0EizfWxLDjKV54Rv9-XH9RA1VU/gviz/tq?tqx=out:csv&sheet=Produtos";
+// ===== CARREGA PRODUTOS VIA CSV =====
+async function loadProducts() {
+  try {
+    // URL CSV da planilha - SUBSTITUA O ID AQUI
+    const SHEETS_URL = "https://docs.google.com/spreadsheets/d/SEU_ID_AQUI/gviz/tq?tqx=out:csv&sheet=Produtos";
+    
+    const response = await fetch(SHEETS_URL);
+    const csv = await response.text();
+    
+    console.log("CSV recebido:", csv); // Debug
+    
+    // Parse CSV melhorado
+    const lines = csv.trim().split('\n');
+    products = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      // Parser de CSV robusto que lida com aspas
+      const values = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let j = 0; j < line.length; j++) {
+        const char = line[j];
         
-        const response = await fetch(SHEETS_URL);
-        const csv = await response.text();
-        
-        // Parse CSV
-        const lines = csv.split('\n');
-        products = [];
-        
-        for (let i = 1; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (!line) continue;
-          
-          // Parse CSV com aspas
-          const values = line.split(',').map(v => v.replace(/"/g, '').trim());
-          
-          if (values[0]) {
-            products.push({
-              id: values[0],
-              nome: values[1] || "Produto",
-              descricao: values[2] || "",
-              preco: parseFloat(values[3]) || 0,
-              categoria: values[4] || "",
-              foto: values[5] || ""
-            });
-          }
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          values.push(current.trim());
+          current = '';
+        } else {
+          current += char;
         }
+      }
+      values.push(current.trim());
+      
+      // Remover aspas finais
+      const clean = values.map(v => v.replace(/"/g, '').trim());
+      
+      console.log("Row", i, ":", clean); // Debug
+      
+      if (clean[0]) { // Se tiver ID
+        const preco = parseFloat(clean[3]?.replace('R$', '').replace(',', '.').trim()) || 0;
         
-        renderMenu();
-      } catch (error) {
-        console.error("Erro:", error);
-        document.getElementById("menuSection").innerHTML = '<p style="grid-column: 1/-1; color: red; text-align: center;">❌ Erro ao carregar produtos</p>';
+        products.push({
+          id: clean[0],
+          nome: clean[1] || "Produto",
+          descricao: clean[2] || "",
+          preco: preco,
+          categoria: clean[4] || "",
+          foto: clean[5] || ""
+        });
+        
+        console.log("Produto adicionado:", clean[1], "- Preço:", preco);
       }
     }
+    
+    console.log("Total de produtos:", products.length);
+    renderMenu();
+  } catch (error) {
+    console.error("Erro:", error);
+    document.getElementById("menuSection").innerHTML = '<p style="grid-column: 1/-1; color: red; text-align: center;">❌ Erro ao carregar produtos: ' + error.message + '</p>';
+  }
+}
+
 
     function renderMenu() {
       const section = document.getElementById("menuSection");
@@ -288,3 +317,4 @@
   </script>
 </body>
 </html>
+
