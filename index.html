@@ -1,582 +1,165 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haffe's - Pedidos Online</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --color-primary: #ff6b35;
-            --color-secondary: #004e89;
-            --color-success: #1abc9c;
-            --color-light: #f8f9fa;
-            --color-dark: #2c3e50;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        header {
-            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .main {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 40px;
-        }
-
-        @media (max-width: 768px) {
-            .main {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .section {
-            background: var(--color-light);
-            padding: 20px;
-            border-radius: 8px;
-        }
-
-        .section h2 {
-            color: var(--color-secondary);
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .produtos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .produto-card {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .produto-card:hover {
-            border-color: var(--color-primary);
-            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
-            transform: translateY(-5px);
-        }
-
-        .produto-card h3 {
-            color: var(--color-secondary);
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
-
-        .produto-card p {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .produto-price {
-            color: var(--color-primary);
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-        }
-
-        .btn-add {
-            background: var(--color-primary);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .btn-add:hover {
-            background: #e55a2b;
-            transform: scale(1.05);
-        }
-
-        .carrinho-item {
-            background: white;
-            border-left: 4px solid var(--color-primary);
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .carrinho-item span {
-            color: var(--color-primary);
-            font-weight: bold;
-        }
-
-        .btn-remove {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8em;
-        }
-
-        .btn-remove:hover {
-            background: #c0392b;
-        }
-
-        .total {
-            background: var(--color-secondary);
-            color: white;
-            padding: 15px;
-            border-radius: 6px;
-            font-size: 1.3em;
-            font-weight: bold;
-            text-align: right;
-            margin: 20px 0;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--color-secondary);
-            font-weight: bold;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1em;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
-
-        .payment-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .payment-option {
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            text-align: center;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .payment-option:hover {
-            border-color: var(--color-primary);
-            background: rgba(255, 107, 53, 0.1);
-        }
-
-        .payment-option.active {
-            background: var(--color-primary);
-            color: white;
-            border-color: var(--color-primary);
-        }
-
-        .btn-submit {
-            width: 100%;
-            background: var(--color-success);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 6px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-submit:hover {
-            background: #16a085;
-            transform: scale(1.02);
-        }
-
-        .btn-submit:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-        }
-
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        }
-
-        .modal-content h2 {
-            color: var(--color-success);
-            margin-bottom: 20px;
-        }
-
-        .qr-code {
-            margin: 20px 0;
-        }
-
-        .qr-code img {
-            max-width: 300px;
-            border-radius: 8px;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid var(--color-light);
-            border-top: 4px solid var(--color-primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-
-        .alert.error {
-            background: #fadbd8;
-            color: #c0392b;
-            border-left: 4px solid #c0392b;
-        }
-
-        .alert.success {
-            background: #d5f4e6;
-            color: #16a085;
-            border-left: 4px solid #16a085;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haffe's Hamburgueria</title>
+  <style>
+    body {
+      background: #181818 url('URL_DA_TEXTURA.jpg') repeat;
+      color: #fff;
+      font-family: 'Segoe UI', 'Montserrat', Arial, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+    }
+    header {
+      text-align: center;
+      padding: 30px 10px;
+      background: linear-gradient(90deg, #181818 75%, #FF6600 100%);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    header h1 {
+      color: #FF6600;
+      font-size: 2.6em;
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+      font-weight: bold;
+    }
+    header p {
+      color: #ffe1c1;
+      font-size: 1.1em;
+    }
+    .menu-container {
+      max-width: 1200px;
+      margin: 48px auto 24px auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+      padding: 0 16px;
+    }
+    .menu-card {
+      background: rgba(24,24,24,0.95);
+      border-radius: 12px;
+      box-shadow: 0 5px 40px rgba(255,102,0,0.15);
+      border: 2px solid #282828;
+      overflow: hidden;
+      transition: box-shadow 0.3s;
+    }
+    .menu-card:hover {
+      box-shadow: 0 8px 60px rgba(255,102,0,0.33);
+      border-color: #FF6600;
+    }
+    .menu-img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      background: #333;
+    }
+    .menu-content {
+      padding: 20px;
+    }
+    .menu-title {
+      font-size: 1.35em;
+      color: #FF6600;
+      margin: 0 0 6px 0;
+    }
+    .menu-price {
+      color: #ffe1c1;
+      font-size: 1.2em;
+      font-weight: bold;
+      float: right;
+    }
+    .menu-desc {
+      margin: 12px 0;
+      color: #fff;
+      font-size: 0.98em;
+      opacity: 0.85;
+      font-style: italic;
+    }
+    .adicionais-list {
+      margin: 8px 0 14px 0;
+      color: #ffc278;
+    }
+    .adicionais-list label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.94em;
+      cursor: pointer;
+    }
+    .adicionais-list input[type="checkbox"] {
+      accent-color: #FF6600;
+      margin-right: 8px;
+    }
+    .add-btn {
+      background: #FF6600;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      padding: 12px 30px;
+      cursor: pointer;
+      box-shadow: 0 2px 16px rgba(255,102,0,.15);
+      font-size: 1.12em;
+      letter-spacing: 2px;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .add-btn:hover {
+      background: #ff4500;
+      box-shadow: 0 5px 32px rgba(255,102,0,0.28);
+    }
+    @media (max-width: 768px) {
+      .menu-container {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      .menu-card {
+        margin-bottom: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🍔 haffe's - Hamburgueria Artesanal</h1>
-            <p>Pedidos Online - Entrega Rápida</p>
-        </header>
-
-        <div class="main">
-            <!-- SEÇÃO DE PRODUTOS -->
-            <div class="section">
-                <h2>📋 Menu de Produtos</h2>
-                <div id="alertas"></div>
-                <div class="produtos-grid" id="produtosGrid">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-
-            <!-- SEÇÃO DE CARRINHO E PEDIDO -->
-            <div class="section">
-                <h2>🛒 Seu Pedido</h2>
-
-                <div id="carrinhoItems"></div>
-
-                <div class="total">
-                    Total: R$ <span id="totalValor">0.00</span>
-                </div>
-
-                <form id="formularioPedido">
-                    <div class="form-group">
-                        <label>Nome *</label>
-                        <input type="text" id="cliente" required placeholder="Seu nome">
-                    </div>
-
-                    <div class="form-group">
-                        <label>WhatsApp *</label>
-                        <input type="tel" id="telefone" required placeholder="(11) 99999-9999">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Endereço de Entrega *</label>
-                        <textarea id="endereco" required placeholder="Rua, número, complemento..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Observações (opcional)</label>
-                        <textarea id="observacoes" placeholder="Sem cebola, sem maionese..."></textarea>
-                    </div>
-
-                    <label style="font-weight: bold; display: block; margin-bottom: 10px;">Forma de Pagamento *</label>
-                    <div class="payment-options">
-                        <div class="payment-option" data-payment="PIX">
-                            <input type="radio" name="pagamento" value="PIX" checked hidden>
-                            💳 PIX
-                        </div>
-                        <div class="payment-option active" data-payment="PIX">
-                            <input type="radio" name="pagamento" value="PIX" checked hidden>
-                            💳 PIX
-                        </div>
-                        <div class="payment-option" data-payment="CARTAO">
-                            <input type="radio" name="pagamento" value="CARTAO" hidden>
-                            💰 Cartão
-                        </div>
-                    </div>
-
-                    <div class="loading" id="loading">
-                        <div class="spinner"></div>
-                        <p>Processando seu pedido...</p>
-                    </div>
-
-                    <button type="submit" class="btn-submit" id="btnSubmit">Confirmar Pedido</button>
-                </form>
-            </div>
+  <header>
+    <h1>Haffe's Hamburgueria</h1>
+    <p>Cardápio Online | Faça seu pedido com adicionais!</p>
+  </header>
+  <main>
+    <div class="menu-container">
+      
+      <!-- Card Produto -->
+      <div class="menu-card">
+        <img class="menu-img" src="URL_FOTO_BURGUER.jpg" alt="Cheddar Bacon Artesanal">
+        <div class="menu-content">
+          <div class="menu-title">Cheddar Bacon Artesanal <span class="menu-price">R$ 28,90</span></div>
+          <div class="menu-desc">Burger 160g, queijo cheddar cremoso, bacon artesanal e pão brioche</div>
+          <div class="adicionais-list">
+            <label><input type="checkbox" name="adicional1"> Adicional de burger (+R$ 9,00)</label>
+            <label><input type="checkbox" name="adicional2"> Maionese artesanal (+R$ 5,00)</label>
+            <label><input type="checkbox" name="ketchup"> Ketchup Heinz</label>
+            <label><input type="checkbox" name="guardanapo"> Guardanapo extra</label>
+          </div>
+          <button class="add-btn">Adicionar ao Pedido</button>
         </div>
-    </div>
-
-    <!-- MODAL DE SUCESSO -->
-    <div class="modal" id="modalSucesso">
-        <div class="modal-content">
-            <h2>✅ Pedido Confirmado!</h2>
-            <p>Seu pedido foi recebido com sucesso!</p>
-            <p>ID do Pedido: <strong id="pedidoID"></strong></p>
-            <p>Você receberá atualizações por WhatsApp</p>
-            
-            <div id="paymentInfo"></div>
-            
-            <button class="btn-submit" onclick="location.reload()">Fazer Novo Pedido</button>
+      </div>
+      
+      <!-- Outros cards podem ser duplicados abaixo -->
+      <div class="menu-card">
+        <img class="menu-img" src="URL_FOTO_OUTRO.jpg" alt="Barbecue Supreme">
+        <div class="menu-content">
+          <div class="menu-title">Barbecue Supreme <span class="menu-price">R$ 29,90</span></div>
+          <div class="menu-desc">Burger de costela 180g, queijo prato, cebola crocante, molho barbecue e pão australiano</div>
+          <div class="adicionais-list">
+            <label><input type="checkbox" name="adicional3"> Bacon extra (+R$ 6,00)</label>
+            <label><input type="checkbox" name="adicional4"> Maionese artesanal (+R$ 5,00)</label>
+            <label><input type="checkbox" name="ketchup"> Ketchup Heinz</label>
+            <label><input type="checkbox" name="guardanapo"> Guardanapo extra</label>
+          </div>
+          <button class="add-btn">Adicionar ao Pedido</button>
         </div>
+      </div>
+      <!-- ... Repita para outros produtos ... -->
+      
     </div>
-
-    <script>
-        // ===== CONFIGURAÇÃO =====
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3mhbI6K7QfuyDOBZmQ7sXUQosHcR4VRCZeULK4av0eXLs923kyE6Ba52kKSPxxCrjZw/exec"; // Cole a URL do deploy aqui
-        
-        let carrinho = [];
-        let pagamentoSelecionado = "PIX";
-
-        // ===== CARREGAR PRODUTOS =====
-        async function carregarProdutos() {
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=getProdutos`);
-                const produtos = await response.json();
-
-                const grid = document.getElementById("produtosGrid");
-                grid.innerHTML = "";
-
-                produtos.forEach(produto => {
-                    const card = document.createElement("div");
-                    card.className = "produto-card";
-                    card.innerHTML = `
-                        <h3>${produto.nome}</h3>
-                        <p>${produto.descricao}</p>
-                        <div class="produto-price">R$ ${produto.preco.toFixed(2)}</div>
-                        <button class="btn-add" onclick="adicionarAoCarrinho('${produto.id}', '${produto.nome}', ${produto.preco})">
-                            + Adicionar
-                        </button>
-                    `;
-                    grid.appendChild(card);
-                });
-            } catch (error) {
-                console.error("Erro ao carregar produtos:", error);
-                document.getElementById("produtosGrid").innerHTML = "<p style='color: red;'>Erro ao carregar produtos</p>";
-            }
-        }
-
-        // ===== GERENCIAR CARRINHO =====
-        function adicionarAoCarrinho(id, nome, preco) {
-            carrinho.push({ id, nome, preco });
-            atualizarCarrinho();
-            mostrarAlerta("✅ Produto adicionado ao carrinho!", "success");
-        }
-
-        function removerDoCarrinho(index) {
-            carrinho.splice(index, 1);
-            atualizarCarrinho();
-        }
-
-        function atualizarCarrinho() {
-            const container = document.getElementById("carrinhoItems");
-            const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
-
-            container.innerHTML = carrinho.map((item, index) => `
-                <div class="carrinho-item">
-                    <div>
-                        <strong>${item.nome}</strong>
-                        <div style="font-size: 0.9em; color: #666;">R$ ${item.preco.toFixed(2)}</div>
-                    </div>
-                    <button class="btn-remove" onclick="removerDoCarrinho(${index})">Remover</button>
-                </div>
-            `).join("");
-
-            document.getElementById("totalValor").textContent = total.toFixed(2);
-            document.getElementById("btnSubmit").disabled = carrinho.length === 0;
-        }
-
-        // ===== GERENCIAR PAGAMENTO =====
-        document.querySelectorAll(".payment-option").forEach(option => {
-            option.addEventListener("click", function() {
-                document.querySelectorAll(".payment-option").forEach(o => o.classList.remove("active"));
-                this.classList.add("active");
-                pagamentoSelecionado = this.dataset.payment;
-            });
-        });
-
-        // ===== ENVIAR PEDIDO =====
-        document.getElementById("formularioPedido").addEventListener("submit", async function(e) {
-            e.preventDefault();
-
-            if (carrinho.length === 0) {
-                mostrarAlerta("❌ Adicione produtos ao carrinho!", "error");
-                return;
-            }
-
-            const loading = document.getElementById("loading");
-            const btnSubmit = document.getElementById("btnSubmit");
-            
-            loading.classList.add("active");
-            btnSubmit.disabled = true;
-
-            try {
-                const dados = {
-                    action: "criarPedido",
-                    cliente: document.getElementById("cliente").value,
-                    telefone: document.getElementById("telefone").value,
-                    endereco: document.getElementById("endereco").value,
-                    observacoes: document.getElementById("observacoes").value,
-                    itens: carrinho,
-                    valorTotal: carrinho.reduce((sum, item) => sum + item.preco, 0),
-                    tipoPagamento: pagamentoSelecionado,
-                    comprovantePIX: ""
-                };
-
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: "POST",
-                    payload: JSON.stringify(dados)
-                });
-
-                const resultado = await response.json();
-
-                if (resultado.sucesso) {
-                    document.getElementById("pedidoID").textContent = resultado.pedidoID.substring(0, 8);
-                    
-                    const paymentInfo = document.getElementById("paymentInfo");
-                    if (pagamentoSelecionado === "PIX" && resultado.qrCode) {
-                        paymentInfo.innerHTML = `
-                            <div class="qr-code">
-                                <p><strong>Escaneie o QR Code para pagar:</strong></p>
-                                <img src="${resultado.qrCode}" alt="QR Code PIX">
-                            </div>
-                        `;
-                    } else {
-                        paymentInfo.innerHTML = `<p><strong>Pagamento via Cartão:</strong> Você receberá instruções por WhatsApp</p>`;
-                    }
-
-                    document.getElementById("modalSucesso").classList.add("active");
-                    carrinho = [];
-                    atualizarCarrinho();
-                } else {
-                    mostrarAlerta("❌ " + resultado.erro, "error");
-                }
-            } catch (error) {
-                console.error("Erro:", error);
-                mostrarAlerta("❌ Erro ao processar pedido. Tente novamente.", "error");
-            } finally {
-                loading.classList.remove("active");
-                btnSubmit.disabled = false;
-            }
-        });
-
-        // ===== FUNÇÕES AUXILIARES =====
-        function mostrarAlerta(mensagem, tipo) {
-            const alertas = document.getElementById("alertas");
-            const alert = document.createElement("div");
-            alert.className = `alert ${tipo}`;
-            alert.textContent = mensagem;
-            alertas.appendChild(alert);
-            setTimeout(() => alert.remove(), 3000);
-        }
-
-        // ===== INICIALIZAR =====
-        carregarProdutos();
-        atualizarCarrinho();
-    </script>
+  </main>
 </body>
 </html>
-
