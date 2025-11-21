@@ -3,163 +3,1061 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Haffe's Hamburgueria</title>
+  <title>Haffe's Hamburgueria | Pedidos Online</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #FF6600;
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light-text: #ffe1c1;
+      --text: #fff;
+      --secondary-text: #b0b0b0;
+      --border: #282828;
+      --radius: 12px;
+    }
+
     body {
-      background: #181818 url('URL_DA_TEXTURA.jpg') repeat;
-      color: #fff;
+      background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+      color: var(--text);
       font-family: 'Segoe UI', 'Montserrat', Arial, sans-serif;
       min-height: 100vh;
-      margin: 0;
+      overflow-x: hidden;
     }
+
+    /* ===== HEADER ===== */
     header {
-      text-align: center;
-      padding: 30px 10px;
-      background: linear-gradient(90deg, #181818 75%, #FF6600 100%);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-    }
-    header h1 {
-      color: #FF6600;
-      font-size: 2.6em;
-      margin-bottom: 8px;
-      letter-spacing: 2px;
-      font-weight: bold;
-    }
-    header p {
-      color: #ffe1c1;
-      font-size: 1.1em;
-    }
-    .menu-container {
-      max-width: 1200px;
-      margin: 48px auto 24px auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 32px;
-      padding: 0 16px;
-    }
-    .menu-card {
-      background: rgba(24,24,24,0.95);
-      border-radius: 12px;
-      box-shadow: 0 5px 40px rgba(255,102,0,0.15);
-      border: 2px solid #282828;
-      overflow: hidden;
-      transition: box-shadow 0.3s;
-    }
-    .menu-card:hover {
-      box-shadow: 0 8px 60px rgba(255,102,0,0.33);
-      border-color: #FF6600;
-    }
-    .menu-img {
-      width: 100%;
-      height: 190px;
-      object-fit: cover;
-      background: #333;
-    }
-    .menu-content {
+      background: linear-gradient(90deg, var(--dark) 0%, var(--dark) 85%, var(--primary) 100%);
       padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
-    .menu-title {
-      font-size: 1.35em;
-      color: #FF6600;
-      margin: 0 0 6px 0;
+
+    header h1 {
+      color: var(--primary);
+      font-size: 2.2em;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
     }
-    .menu-price {
-      color: #ffe1c1;
+
+    header p {
+      color: var(--light-text);
+      font-size: 0.95em;
+    }
+
+    /* ===== CONTAINER ===== */
+    .wrapper {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 1024px) {
+      .wrapper {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===== MENU SECTION ===== */
+    .menu-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .product-card {
+      background: rgba(40, 40, 40, 0.6);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .product-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 32px rgba(255, 102, 0, 0.2);
+      transform: translateY(-5px);
+    }
+
+    .product-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #333, #222);
+    }
+
+    .product-info {
+      padding: 16px;
+    }
+
+    .product-name {
+      color: var(--primary);
       font-size: 1.2em;
       font-weight: bold;
-      float: right;
-    }
-    .menu-desc {
-      margin: 12px 0;
-      color: #fff;
-      font-size: 0.98em;
-      opacity: 0.85;
-      font-style: italic;
-    }
-    .adicionais-list {
-      margin: 8px 0 14px 0;
-      color: #ffc278;
-    }
-    .adicionais-list label {
-      display: block;
       margin-bottom: 4px;
-      font-size: 0.94em;
+    }
+
+    .product-desc {
+      color: var(--secondary-text);
+      font-size: 0.9em;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .product-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .product-price {
+      color: var(--light-text);
+      font-size: 1.25em;
+      font-weight: bold;
+    }
+
+    .btn-add {
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .btn-add:hover {
+      background: #ff5500;
+      transform: scale(1.05);
+    }
+
+    /* ===== CARRINHO LATERAL ===== */
+    .cart-sidebar {
+      position: sticky;
+      top: 80px;
+      height: fit-content;
+      background: rgba(30, 30, 30, 0.9);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .cart-title {
+      color: var(--primary);
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .cart-items {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .cart-item {
+      background: rgba(255, 102, 0, 0.1);
+      padding: 12px;
+      margin-bottom: 10px;
+      border-left: 3px solid var(--primary);
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cart-item-info {
+      flex: 1;
+    }
+
+    .cart-item-name {
+      color: var(--text);
+      font-weight: bold;
+      font-size: 0.95em;
+    }
+
+    .cart-item-qty {
+      color: var(--secondary-text);
+      font-size: 0.85em;
+      margin-top: 2px;
+    }
+
+    .cart-item-price {
+      color: var(--light-text);
+      font-weight: bold;
+      text-align: right;
+      margin-right: 10px;
+    }
+
+    .btn-remove {
+      background: #d32f2f;
+      color: white;
+      border: none;
+      padding: 2px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.8em;
+    }
+
+    .cart-summary {
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      color: var(--secondary-text);
+    }
+
+    .summary-row.total {
+      color: var(--light-text);
+      font-size: 1.2em;
+      font-weight: bold;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+
+    .coupon-input {
+      width: 100%;
+      padding: 8px;
+      background: rgba(255, 102, 0, 0.1);
+      border: 1px solid var(--primary);
+      border-radius: 4px;
+      color: var(--text);
+      margin-bottom: 10px;
+      font-size: 0.9em;
+    }
+
+    .btn-checkout {
+      width: 100%;
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1.05em;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+
+    .btn-checkout:hover {
+      background: #ff5500;
+      transform: scale(1.02);
+    }
+
+    .btn-checkout:disabled {
+      background: #555;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    /* ===== MODAL ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: var(--dark);
+      max-width: 600px;
+      width: 90%;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    }
+
+    .modal-header {
+      background: linear-gradient(90deg, var(--dark) 0%, var(--primary) 100%);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      color: var(--primary);
+      font-size: 1.5em;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--light-text);
+      font-size: 1.5em;
       cursor: pointer;
     }
-    .adicionais-list input[type="checkbox"] {
-      accent-color: #FF6600;
-      margin-right: 8px;
+
+    .modal-body {
+      padding: 20px;
     }
-    .add-btn {
-      background: #FF6600;
-      color: #fff;
+
+    .section-title {
+      color: var(--primary);
+      font-size: 1.1em;
+      margin: 20px 0 12px 0;
+      font-weight: bold;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .option-group {
+      margin-bottom: 16px;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background: rgba(255, 102, 0, 0.05);
+      border-radius: 4px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .option-label:hover {
+      background: rgba(255, 102, 0, 0.15);
+    }
+
+    .option-label input {
+      accent-color: var(--primary);
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .option-name {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .option-price {
+      color: var(--light-text);
+      font-size: 0.9em;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 102, 0, 0.1);
+      border: 1px solid var(--primary);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      font-size: 0.95em;
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .qty-btn {
+      background: var(--primary);
+      color: #000;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .qty-display {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: var(--light-text);
+      flex: 1;
+      text-align: center;
+    }
+
+    .modal-footer {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-footer button {
+      flex: 1;
+      padding: 12px;
       border: none;
       border-radius: 6px;
       font-weight: bold;
-      padding: 12px 30px;
       cursor: pointer;
-      box-shadow: 0 2px 16px rgba(255,102,0,.15);
-      font-size: 1.12em;
-      letter-spacing: 2px;
-      transition: background 0.2s, box-shadow 0.2s;
+      transition: all 0.2s;
+      font-size: 1em;
     }
-    .add-btn:hover {
-      background: #ff4500;
-      box-shadow: 0 5px 32px rgba(255,102,0,0.28);
+
+    .btn-cancel {
+      background: #555;
+      color: white;
     }
+
+    .btn-confirm {
+      background: var(--primary);
+      color: #000;
+    }
+
+    .btn-confirm:hover {
+      background: #ff5500;
+    }
+
+    /* ===== CHECKOUT MODAL ===== */
+    .checkout-modal {
+      display: none;
+    }
+
+    .checkout-modal.active {
+      display: flex !important;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      color: var(--primary);
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 102, 0, 0.1);
+      border: 1px solid var(--primary);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 1em;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .payment-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .payment-option {
+      padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(255, 102, 0, 0.05);
+    }
+
+    .payment-option:hover {
+      border-color: var(--primary);
+      background: rgba(255, 102, 0, 0.15);
+    }
+
+    .payment-option input {
+      display: none;
+    }
+
+    .payment-option.selected {
+      background: rgba(255, 102, 0, 0.3);
+      border-color: var(--primary);
+    }
+
+    .alert {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+
+    .alert.error {
+      background: rgba(211, 47, 47, 0.2);
+      border: 1px solid #d32f2f;
+      color: #ff6b6b;
+    }
+
+    .alert.success {
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid #4caf50;
+      color: #90ee90;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 102, 0, 0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading.active {
+      display: block;
+    }
+
     @media (max-width: 768px) {
-      .menu-container {
+      .wrapper {
         grid-template-columns: 1fr;
-        gap: 24px;
       }
-      .menu-card {
-        margin-bottom: 16px;
+
+      .cart-sidebar {
+        position: static;
+      }
+
+      header h1 {
+        font-size: 1.8em;
+      }
+
+      .menu-section {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Haffe's Hamburgueria</h1>
-    <p>Cardápio Online | Faça seu pedido com adicionais!</p>
+    <h1>🍔 Haffe's Hamburgueria</h1>
+    <p>Cardápio Online | Entrega Rápida</p>
   </header>
-  <main>
-    <div class="menu-container">
-      
-      <!-- Card Produto -->
-      <div class="menu-card">
-        <img class="menu-img" src="URL_FOTO_BURGUER.jpg" alt="Cheddar Bacon Artesanal">
-        <div class="menu-content">
-          <div class="menu-title">Cheddar Bacon Artesanal <span class="menu-price">R$ 28,90</span></div>
-          <div class="menu-desc">Burger 160g, queijo cheddar cremoso, bacon artesanal e pão brioche</div>
-          <div class="adicionais-list">
-            <label><input type="checkbox" name="adicional1"> Adicional de burger (+R$ 9,00)</label>
-            <label><input type="checkbox" name="adicional2"> Maionese artesanal (+R$ 5,00)</label>
-            <label><input type="checkbox" name="ketchup"> Ketchup Heinz</label>
-            <label><input type="checkbox" name="guardanapo"> Guardanapo extra</label>
-          </div>
-          <button class="add-btn">Adicionar ao Pedido</button>
-        </div>
-      </div>
-      
-      <!-- Outros cards podem ser duplicados abaixo -->
-      <div class="menu-card">
-        <img class="menu-img" src="URL_FOTO_OUTRO.jpg" alt="Barbecue Supreme">
-        <div class="menu-content">
-          <div class="menu-title">Barbecue Supreme <span class="menu-price">R$ 29,90</span></div>
-          <div class="menu-desc">Burger de costela 180g, queijo prato, cebola crocante, molho barbecue e pão australiano</div>
-          <div class="adicionais-list">
-            <label><input type="checkbox" name="adicional3"> Bacon extra (+R$ 6,00)</label>
-            <label><input type="checkbox" name="adicional4"> Maionese artesanal (+R$ 5,00)</label>
-            <label><input type="checkbox" name="ketchup"> Ketchup Heinz</label>
-            <label><input type="checkbox" name="guardanapo"> Guardanapo extra</label>
-          </div>
-          <button class="add-btn">Adicionar ao Pedido</button>
-        </div>
-      </div>
-      <!-- ... Repita para outros produtos ... -->
-      
+
+  <div class="wrapper">
+    <!-- MENU -->
+    <div class="menu-section" id="menuSection">
+      <!-- Produtos carregam aqui via JavaScript -->
     </div>
-  </main>
+
+    <!-- CARRINHO LATERAL -->
+    <div class="cart-sidebar">
+      <div class="cart-title">🛒 Seu Pedido</div>
+      <div class="cart-items" id="cartItems"></div>
+      
+      <div class="cart-summary">
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span id="subtotal">R$ 0,00</span>
+        </div>
+        <div class="summary-row">
+          <span>Taxa Entrega:</span>
+          <span id="delivery">R$ 5,00</span>
+        </div>
+        <div class="summary-row">
+          <span>Desconto:</span>
+          <span id="discount">R$ 0,00</span>
+        </div>
+        <div class="summary-row total">
+          <span>TOTAL:</span>
+          <span id="total">R$ 0,00</span>
+        </div>
+
+        <input type="text" id="couponInput" class="coupon-input" placeholder="Código do cupom">
+        <button class="btn-checkout" onclick="applyCoupon()">Aplicar Cupom</button>
+      </div>
+
+      <button class="btn-checkout" id="checkoutBtn" onclick="openCheckout()" disabled>
+        Finalizar Pedido
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL DO PRODUTO -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalProductName"></h2>
+        <button class="close-btn" onclick="closeProductModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalAlert"></div>
+
+        <!-- Ponto da carne -->
+        <div id="meatPointSection" class="section-title" style="display: none; margin-top: 0;">Ponto da Carne</div>
+        <div id="meatPointOptions" class="option-group"></div>
+
+        <!-- Adicionais -->
+        <div class="section-title">Adicionais</div>
+        <div id="additionalsOptions" class="option-group"></div>
+
+        <!-- Molhos -->
+        <div class="section-title">Molhos e Complementos</div>
+        <div id="saucesOptions" class="option-group"></div>
+
+        <!-- Observações -->
+        <div class="section-title">Observações (Opcional)</div>
+        <textarea id="observations" placeholder="Ex: Sem cebola, sem maionese..."></textarea>
+
+        <!-- Quantidade -->
+        <div class="section-title">Quantidade</div>
+        <div class="quantity-selector">
+          <button class="qty-btn" onclick="decreaseQty()">−</button>
+          <div class="qty-display" id="qtyDisplay">1</div>
+          <button class="qty-btn" onclick="increaseQty()">+</button>
+        </div>
+
+        <!-- Preço final -->
+        <div style="text-align: right; padding: 15px 0; font-size: 1.3em; color: var(--light-text); font-weight: bold;">
+          Total: <span id="modalPrice">R$ 0,00</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeProductModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="addToCart()">Adicionar ao Pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CHECKOUT -->
+  <div id="checkoutModal" class="modal checkout-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Finalizar Pedido</h2>
+        <button class="close-btn" onclick="closeCheckout()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="checkoutAlert"></div>
+        <div class="loading" id="checkoutLoading">
+          <div class="spinner"></div>
+          <p>Processando seu pedido...</p>
+        </div>
+
+        <form id="checkoutForm" style="display: block;">
+          <div class="form-group">
+            <label>Nome *</label>
+            <input type="text" id="clientName" required placeholder="Seu nome completo">
+          </div>
+
+          <div class="form-group">
+            <label>WhatsApp *</label>
+            <input type="tel" id="clientPhone" required placeholder="(11) 99999-9999">
+          </div>
+
+          <div class="form-group">
+            <label>Endereço de Entrega *</label>
+            <input type="text" id="clientAddress" required placeholder="Rua, número, complemento">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bairro *</label>
+              <input type="text" id="clientNeighborhood" required placeholder="Bairro">
+            </div>
+            <div class="form-group">
+              <label>CEP</label>
+              <input type="text" id="clientCEP" placeholder="12345-678">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Forma de Pagamento *</label>
+            <div class="payment-options">
+              <label class="payment-option selected">
+                <input type="radio" name="payment" value="PIX" checked>
+                💳 PIX
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="CARTAO">
+                💰 Cartão
+              </label>
+            </div>
+          </div>
+
+          <div id="pixInfo" style="background: rgba(76, 175, 80, 0.2); padding: 12px; border-radius: 6px; margin-bottom: 15px; display: block;">
+            <strong style="color: #90ee90;">💡 PIX QR Code:</strong>
+            <p style="font-size: 0.9em; color: var(--secondary-text); margin-top: 5px;">Você receberá um QR Code para escanear após confirmar o pedido.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Observação Final (Opcional)</label>
+            <textarea id="finalObservation" placeholder="Alguma observação importante?"></textarea>
+          </div>
+
+          <button type="submit" class="btn-checkout" style="width: 100%;">
+            Confirmar Pedido - R$ <span id="checkoutTotal">0,00</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== CONFIGURAÇÕES =====
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3mhbI6K7QfuyDOBZmQ7sXUQosHcR4VRCZeULK4av0eXLs923kyE6Ba52kKSPxxCrjZw/exec"; // Cole sua URL do Apps Script
+    
+    let products = [];
+    let cart = [];
+    let currentProduct = null;
+    let currentQty = 1;
+    let currentAdditions = {};
+    let currentObservations = "";
+    let couponDiscount = 0;
+    const DELIVERY_FEE = 5.00;
+
+    // ===== CARREGA PRODUTOS =====
+    async function loadProducts() {
+      try {
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=getProdutos`);
+        products = await response.json();
+        renderMenu();
+      } catch (error) {
+        console.error("Erro ao carregar produtos:", error);
+      }
+    }
+
+    function renderMenu() {
+      const menuSection = document.getElementById("menuSection");
+      menuSection.innerHTML = products.map(product => `
+        <div class="product-card" onclick="openProductModal(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+          <div class="product-img" style="background: linear-gradient(135deg, #FF6600, #ff8c42);"></div>
+          <div class="product-info">
+            <div class="product-name">${product.nome}</div>
+            <div class="product-desc">${product.descricao}</div>
+            <div class="product-footer">
+              <span class="product-price">R$ ${product.preco.toFixed(2)}</span>
+              <button class="btn-add" onclick="event.stopPropagation();">Adicionar</button>
+            </div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // ===== MODAL DO PRODUTO =====
+    function openProductModal(product) {
+      currentProduct = product;
+      currentQty = 1;
+      currentAdditions = {};
+      currentObservations = "";
+
+      document.getElementById("modalProductName").textContent = product.nome;
+      document.getElementById("observations").value = "";
+      document.getElementById("qtyDisplay").textContent = "1";
+
+      // Render ponto da carne (apenas para produtos com carne)
+      const meatSection = document.getElementById("meatPointSection");
+      const meatOptions = document.getElementById("meatPointOptions");
+      meatOptions.innerHTML = "";
+      
+      if (product.categoria && product.categoria.toLowerCase().includes("hamburger")) {
+        meatSection.style.display = "block";
+        const meatPoints = [
+          { id: "meatRare", name: "Meia Mal", price: 0 },
+          { id: "meatMedium", name: "Meio Termo", price: 0 },
+          { id: "meatWellDone", name: "Bem Passada", price: 0 }
+        ];
+        meatOptions.innerHTML = meatPoints.map(point => `
+          <label class="option-label">
+            <input type="radio" name="meatPoint" value="${point.id}" ${point.id === 'meatMedium' ? 'checked' : ''}>
+            <span class="option-text">
+              <span class="option-name">${point.name}</span>
+              ${point.price > 0 ? `<span class="option-price">+R$ ${point.price.toFixed(2)}</span>` : ''}
+            </span>
+          </label>
+        `).join("");
+      } else {
+        meatSection.style.display = "none";
+      }
+
+      // Render adicionais
+      const additionalsOptions = document.getElementById("additionalsOptions");
+      const additionals = [
+        { id: "extra_burger", name: "Adicional de Burger", price: 9.00 },
+        { id: "extra_bacon", name: "Bacon Extra", price: 6.00 },
+        { id: "extra_cheese", name: "Queijo Extra", price: 4.00 }
+      ];
+      additionalsOptions.innerHTML = additionals.map(add => `
+        <label class="option-label">
+          <input type="checkbox" name="additional" value="${add.id}" data-price="${add.price}" onchange="updateModalPrice()">
+          <span class="option-text">
+            <span class="option-name">${add.name}</span>
+            <span class="option-price">+R$ ${add.price.toFixed(2)}</span>
+          </span>
+        </label>
+      `).join("");
+
+      // Render molhos
+      const saucesOptions = document.getElementById("saucesOptions");
+      const sauces = [
+        { id: "mayo_artesanal", name: "Maionese Artesanal", price: 5.00 },
+        { id: "ketchup", name: "Ketchup", price: 0 },
+        { id: "mostarda", name: "Mostarda", price: 0 },
+        { id: "guarnapa", name: "Guardanapo Extra", price: 0 }
+      ];
+      saucesOptions.innerHTML = sauces.map(sauce => `
+        <label class="option-label">
+          <input type="checkbox" name="sauce" value="${sauce.id}" data-price="${sauce.price}" onchange="updateModalPrice()">
+          <span class="option-text">
+            <span class="option-name">${sauce.name}</span>
+            ${sauce.price > 0 ? `<span class="option-price">+R$ ${sauce.price.toFixed(2)}</span>` : ''}
+          </span>
+        </label>
+      `).join("");
+
+      updateModalPrice();
+      document.getElementById("productModal").classList.add("active");
+    }
+
+    function closeProductModal() {
+      document.getElementById("productModal").classList.remove("active");
+    }
+
+    function updateModalPrice() {
+      let price = currentProduct.preco * currentQty;
+      const checkboxes = document.querySelectorAll('input[name="additional"]:checked, input[name="sauce"]:checked');
+      checkboxes.forEach(cb => {
+        price += parseFloat(cb.dataset.price) * currentQty;
+      });
+      document.getElementById("modalPrice").textContent = `R$ ${price.toFixed(2)}`;
+    }
+
+    function increaseQty() {
+      currentQty++;
+      document.getElementById("qtyDisplay").textContent = currentQty;
+      updateModalPrice();
+    }
+
+    function decreaseQty() {
+      if (currentQty > 1) {
+        currentQty--;
+        document.getElementById("qtyDisplay").textContent = currentQty;
+        updateModalPrice();
+      }
+    }
+
+    function addToCart() {
+      const additionals = {};
+      document.querySelectorAll('input[name="additional"]:checked, input[name="sauce"]:checked').forEach(cb => {
+        additionals[cb.value] = parseFloat(cb.dataset.price);
+      });
+
+      const meatPoint = document.querySelector('input[name="meatPoint"]:checked');
+      const observations = document.getElementById("observations").value;
+
+      let itemPrice = currentProduct.preco;
+      Object.values(additionals).forEach(price => itemPrice += price);
+
+      const cartItem = {
+        id: `${currentProduct.id}-${Date.now()}`,
+        productId: currentProduct.id,
+        name: currentProduct.nome,
+        price: itemPrice,
+        quantity: currentQty,
+        additionals: additionals,
+        meatPoint: meatPoint ? meatPoint.value : null,
+        observations: observations
+      };
+
+      cart.push(cartItem);
+      updateCart();
+      closeProductModal();
+      showAlert("✅ Produto adicionado ao carrinho!", "cart-items");
+    }
+
+    function removeFromCart(itemId) {
+      cart = cart.filter(item => item.id !== itemId);
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItemsDiv = document.getElementById("cartItems");
+      const checkoutBtn = document.getElementById("checkoutBtn");
+
+      if (cart.length === 0) {
+        cartItemsDiv.innerHTML = "<p style='color: var(--secondary-text); text-align: center;'>Carrinho vazio</p>";
+        checkoutBtn.disabled = true;
+      } else {
+        cartItemsDiv.innerHTML = cart.map(item => `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-qty">Qtd: ${item.quantity}</div>
+            </div>
+            <div class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2)}</div>
+            <button class="btn-remove" onclick="removeFromCart('${item.id}')">✕</button>
+          </div>
+        `).join("");
+        checkoutBtn.disabled = false;
+      }
+
+      updateTotals();
+    }
+
+    function updateTotals() {
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const total = subtotal + DELIVERY_FEE - couponDiscount;
+
+      document.getElementById("subtotal").textContent = `R$ ${subtotal.toFixed(2)}`;
+      document.getElementById("discount").textContent = `R$ ${couponDiscount.toFixed(2)}`;
+      document.getElementById("total").textContent = `R$ ${total.toFixed(2)}`;
+      document.getElementById("checkoutTotal").textContent = total.toFixed(2);
+    }
+
+    function applyCoupon() {
+      const couponCode = document.getElementById("couponInput").value;
+      if (couponCode === "HAFFE10") {
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        couponDiscount = subtotal * 0.10;
+        showAlert("✅ Cupom aplicado com 10% de desconto!", "cart-items");
+      } else if (couponCode) {
+        showAlert("❌ Cupom inválido", "cart-items");
+      }
+      updateTotals();
+    }
+
+    function openCheckout() {
+      if (cart.length === 0) {
+        showAlert("❌ Adicione produtos ao carrinho", "checkoutAlert");
+        return;
+      }
+      document.getElementById("checkoutModal").classList.add("active");
+    }
+
+    function closeCheckout() {
+      document.getElementById("checkoutModal").classList.remove("active");
+    }
+
+    // ===== CHECKOUT =====
+    document.getElementById("checkoutForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("clientName").value;
+      const phone = document.getElementById("clientPhone").value;
+      const address = document.getElementById("clientAddress").value;
+      const neighborhood = document.getElementById("clientNeighborhood").value;
+      const payment = document.querySelector('input[name="payment"]:checked').value;
+      const finalObs = document.getElementById("finalObservation").value;
+
+      if (!name || !phone || !address || !neighborhood) {
+        showAlert("❌ Preencha todos os campos obrigatórios", "checkoutAlert");
+        return;
+      }
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const total = subtotal + DELIVERY_FEE - couponDiscount;
+
+      const loading = document.getElementById("checkoutLoading");
+      loading.classList.add("active");
+
+      try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          payload: JSON.stringify({
+            action: "criarPedido",
+            cliente: name,
+            telefone: phone,
+            endereco: `${address}, ${neighborhood}`,
+            itens: cart,
+            valorTotal: total,
+            tipoPagamento: payment,
+            observacoes: finalObs,
+            comprovantePIX: ""
+          })
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.sucesso) {
+          showAlert("✅ Pedido confirmado!", "checkoutAlert");
+          setTimeout(() => {
+            alert(`Pedido realizado com sucesso!\nID: ${resultado.pedidoID.substring(0, 8)}\n\nVocê receberá atualizações por WhatsApp`);
+            cart = [];
+            couponDiscount = 0;
+            updateCart();
+            closeCheckout();
+            document.getElementById("checkoutForm").reset();
+            document.getElementById("couponInput").value = "";
+          }, 1000);
+        } else {
+          showAlert(`❌ ${resultado.erro}`, "checkoutAlert");
+        }
+      } catch (error) {
+        console.error("Erro:", error);
+        showAlert("❌ Erro ao processar pedido", "checkoutAlert");
+      } finally {
+        loading.classList.remove("active");
+      }
+    });
+
+    // ===== PAGAMENTO =====
+    document.querySelectorAll('input[name="payment"]').forEach(radio => {
+      radio.addEventListener("change", function() {
+        document.querySelectorAll(".payment-option").forEach(opt => opt.classList.remove("selected"));
+        this.closest(".payment-option").classList.add("selected");
+      });
+    });
+
+    function showAlert(message, elementId) {
+      const alertDiv = document.getElementById(elementId) || document.getElementById("checkoutAlert");
+      alertDiv.innerHTML = `<div class="alert ${message.includes("✅") ? "success" : "error"}">${message}</div>`;
+      setTimeout(() => alertDiv.innerHTML = "", 3000);
+    }
+
+    // ===== INICIALIZAR =====
+    loadProducts();
+  </script>
 </body>
 </html>
