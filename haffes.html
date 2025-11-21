@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDS - Kitchen Display System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+
+        .kds-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .kds-header h1 {
+            font-size: 2.5em;
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+
+        .kds-header p {
+            font-size: 1.2em;
+            color: #aaa;
+        }
+
+        .pedidos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .pedido-card {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 3px solid #ff6b35;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(255, 107, 53, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .pedido-card.preparando {
+            border-color: #f39c12;
+            box-shadow: 0 8px 32px rgba(243, 156, 18, 0.3);
+        }
+
+        .pedido-card.pronto {
+            border-color: #1abc9c;
+            box-shadow: 0 8px 32px rgba(26, 188, 156, 0.3);
+        }
+
+        .pedido-id {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+
+        .pedido-cliente {
+            font-size: 1.3em;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .pedido-itens {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .item {
+            color: #aaa;
+            margin: 5px 0;
+            padding-left: 10px;
+            border-left: 3px solid #ff6b35;
+        }
+
+        .pedido-status {
+            background: linear-gradient(135deg, #004e89, #0066b3);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .btn-status {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .btn-preparando {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-preparando:hover {
+            background: #e67e22;
+        }
+
+        .btn-pronto {
+            background: #1abc9c;
+            color: white;
+        }
+
+        .btn-pronto:hover {
+            background: #16a085;
+        }
+
+        .btn-entregue {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-entregue:hover {
+            background: #229954;
+        }
+
+        .tempo {
+            text-align: right;
+            font-size: 0.9em;
+            color: #ff6b35;
+            margin-top: 10px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.3em;
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #e55a2b;
+            transform: scale(1.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #0a0a0a;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .novo {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="kds-header">
+        <h1>🍳 KDS - Kitchen Display</h1>
+        <p id="hora"></p>
+    </div>
+
+    <div class="pedidos-grid" id="pedidosGrid">
+        <div class="empty">Carregando pedidos...</div>
+    </div>
+
+    <button class="refresh-btn" onclick="carregarPedidos()">🔄 Atualizar</button>
+
+    <script>
+        const APPS_SCRIPT_URL = "SUBSTITUA_PELA_SUA_URL_DO_APPS_SCRIPT";
+
+        async function carregarPedidos() {
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getKDS`);
+                const pedidos = await response.json();
+
+                const grid = document.getElementById("pedidosGrid");
+                
+                if (pedidos.length === 0) {
+                    grid.innerHTML = '<div class="empty">📭 Nenhum pedido ativo</div>';
+                    return;
+                }
+
+                grid.innerHTML = pedidos.map(pedido => `
+                    <div class="pedido-card ${pedido.status.toLowerCase()}">
+                        <div class="pedido-id">#${pedido.id}</div>
+                        <div class="pedido-cliente">${pedido.cliente}</div>
+                        <div class="pedido-itens">
+                            ${pedido.itens.map(item => `
+                                <div class="item">
+                                    • ${item.nome} - R$ ${item.preco.toFixed(2)}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="pedido-status">${pedido.status}</div>
+                        <button class="btn-status btn-preparando" onclick="atualizarStatus('${pedido.id}', 'Preparando')">
+                            Preparando
+                        </button>
+                        <button class="btn-status btn-pronto" onclick="atualizarStatus('${pedido.id}', 'Pronto')">
+                            ✓ Pronto
+                        </button>
+                        <button class="btn-status btn-entregue" onclick="atualizarStatus('${pedido.id}', 'Entregue')">
+                            ✓✓ Entregue
+                        </button>
+                        <div class="tempo">Recebido: ${new Date(pedido.hora).toLocaleTimeString('pt-BR')}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error("Erro:", error);
+                document.getElementById("pedidosGrid").innerHTML = '<div class="empty">❌ Erro ao carregar pedidos</div>';
+            }
+        }
+
+        async function atualizarStatus(pedidoID, novoStatus) {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    payload: JSON.stringify({
+                        action: "atualizarStatus",
+                        pedidoID: pedidoID,
+                        status: novoStatus
+                    })
+                });
+
+                const resultado = await response.json();
+                if (resultado.sucesso) {
+                    carregarPedidos();
+                }
+            } catch (error) {
+                console.error("Erro ao atualizar status:", error);
+            }
+        }
+
+        function atualizarHora() {
+            document.getElementById("hora").textContent = new Date().toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+        }
+
+        // Atualizar a cada 5 segundos
+        setInterval(carregarPedidos, 5000);
+        setInterval(atualizarHora, 1000);
+
+        carregarPedidos();
+        atualizarHora();
+    </script>
+</body>
+</html>
