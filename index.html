@@ -190,7 +190,7 @@
     async function loadProducts() {
       try {
         // URL CSV - SUBSTITUA O ID_DA_PLANILHA AQUI
-        const SHEETS_URL = "https://docs.google.com/spreadsheets/d/1mepco27k4xrhePSJg0EizfWxLDjKV54Rv9-XH9RA1VU/edit?usp=sharing";
+        const SHEETS_URL = "https://docs.google.com/spreadsheets/d/1mepco27k4xrhePSJg0EizfWxLDjKV54Rv9-XH9RA1VU/gviz/tq?tqx=out:csv&sheet=Produtos";
         
         const response = await fetch(SHEETS_URL);
         if (!response.ok) throw new Error("Erro ao carregar planilha");
@@ -370,4 +370,5 @@
   </script>
 </body>
 </html>
+
 
