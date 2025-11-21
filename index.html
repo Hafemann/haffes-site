@@ -1802,138 +1802,153 @@ function loadProductsViaJSONP() {
 
     // ===== CHECKOUT =====
     document.getElementById("checkoutForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
+  e.preventDefault();
 
-      const name = document.getElementById("clientName").value.trim();
-      const phone = document.getElementById("clientPhone").value.trim();
-      const address = document.getElementById("clientAddress").value.trim();
-      const neighborhood = document.getElementById("clientNeighborhood").value.trim();
-      const payment = document.querySelector('input[name="payment"]:checked').value;
-      const finalObs = document.getElementById("finalObservation").value.trim();
+  const name = document.getElementById("clientName").value.trim();
+  const phone = document.getElementById("clientPhone").value.trim();
+  const address = document.getElementById("clientAddress").value.trim();
+  const neighborhood = document.getElementById("clientNeighborhood").value.trim();
+  const payment = document.querySelector('input[name="payment"]:checked').value;
+  const finalObs = document.getElementById("finalObservation").value.trim();
 
-      if (!name || !phone || !address || !neighborhood) {
-        showAlert("❌ Preencha todos os campos obrigatórios", "checkoutAlert");
-        return;
+  if (!name || !phone || !address || !neighborhood) {
+    showAlert("❌ Preencha todos os campos obrigatórios", "checkoutAlert");
+    return;
+  }
+
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const total = subtotal + DELIVERY_FEE - couponDiscount;
+
+  const loading = document.getElementById("checkoutLoading");
+  const form = document.getElementById("checkoutForm");
+  loading.classList.add("active");
+  form.style.display = "none";
+
+  try {
+    if (payment === "PIX") {
+      // PIX - criar pedido
+      const payload = JSON.stringify({
+        action: "criarPedido",
+        cliente: name,
+        telefone: phone,
+        endereco: `${address}, ${neighborhood}`,
+        itens: cart,
+        valorTotal: total,
+        tipoPagamento: payment,
+        observacoes: finalObs
+      });
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        payload: payload
+      });
+
+      const resultado = await response.text();
+      
+      // Tentar parse JSON
+      let dados = {};
+      try {
+        dados = JSON.parse(resultado);
+      } catch(e) {
+        console.error("Resposta não é JSON:", resultado);
+        dados = { sucesso: false, erro: "Resposta inválida do servidor" };
       }
 
-      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const total = subtotal + DELIVERY_FEE - couponDiscount;
+      if (dados.sucesso) {
+        // Gerar QR code PIX
+        const pixQrUrl = gerarQRCodePIX(total);
+        document.getElementById("pixOrderId").textContent = dados.pedidoID.substring(0, 8);
+        document.getElementById("pixAmount").textContent = total.toFixed(2);
+        document.getElementById("pixKey").textContent = gerarPixCopiaCola(total);
+        document.getElementById("pixQrCode").innerHTML = `<img src="${pixQrUrl}" alt="QR Code PIX">`;
+        
+        closeCheckout();
+        document.getElementById("pixModal").classList.add("active");
+        
+        showAlert("✅ Pedido criado! Escaneie o QR Code para pagar", "checkoutAlert");
 
-      const loading = document.getElementById("checkoutLoading");
-      const form = document.getElementById("checkoutForm");
-      loading.classList.add("active");
-      form.style.display = "none";
-
-      try {
-        if (payment === "PIX") {
-          // PIX - criar pedido e mostrar QR code
-          const response = await fetch(APPS_SCRIPT_URL, {
-            method: "POST",
-            payload: JSON.stringify({
-              action: "criarPedido",
-              cliente: name,
-              telefone: phone,
-              endereco: `${address}, ${neighborhood}`,
-              itens: cart,
-              valorTotal: total,
-              tipoPagamento: payment,
-              observacoes: finalObs,
-              comprovantePIX: ""
-            })
-          });
-
-          const resultado = await response.json();
-
-          if (resultado.sucesso) {
-            // Gerar QR code PIX
-            const pixQrUrl = gerarQRCodePIX(total);
-            document.getElementById("pixOrderId").textContent = resultado.pedidoID.substring(0, 8);
-            document.getElementById("pixAmount").textContent = total.toFixed(2);
-            document.getElementById("pixKey").textContent = gerarPixCopiaCola(total);
-            document.getElementById("pixQrCode").innerHTML = `<img src="${pixQrUrl}" alt="QR Code PIX">`;
-            
-            closeCheckout();
-            document.getElementById("pixModal").classList.add("active");
-            
-            showAlert("✅ Pedido criado! Escaneie o QR Code para pagar", "checkoutAlert");
-            
-            // Enviar WhatsApp
-            enviarWhatsAppNotificacao(phone, name, resultado.pedidoID.substring(0, 8), total);
-
-            // Limpar carrinho
-            setTimeout(() => {
-              cart = [];
-              couponDiscount = 0;
-              updateCart();
-              document.getElementById("checkoutForm").reset();
-              document.getElementById("couponInput").value = "";
-              form.style.display = "block";
-              loading.classList.remove("active");
-            }, 1500);
-          } else {
-            showAlert(`❌ Erro: ${resultado.erro || "Não foi possível processar o pedido"}`, "checkoutAlert");
-            form.style.display = "block";
-            loading.classList.remove("active");
-          }
-        } else {
-          // STRIPE - criar token e enviar
-          if (!stripe || !cardElement) {
-            initStripe();
-          }
-
-          const { token, error } = await stripe.createToken(cardElement);
-
-          if (error) {
-            showAlert(`❌ Erro no cartão: ${error.message}`, "checkoutAlert");
-            form.style.display = "block";
-            loading.classList.remove("active");
-            return;
-          }
-
-          // Criar pedido com Stripe
-          const response = await fetch(APPS_SCRIPT_URL, {
-            method: "POST",
-            payload: JSON.stringify({
-              action: "criarPedidoStripe",
-              cliente: name,
-              telefone: phone,
-              endereco: `${address}, ${neighborhood}`,
-              itens: cart,
-              valorTotal: total,
-              tipoPagamento: "STRIPE",
-              observacoes: finalObs,
-              stripeToken: token.id
-            })
-          });
-
-          const resultado = await response.json();
-
-          if (resultado.sucesso) {
-            showAlert("✅ Pagamento processado! Pedido confirmado", "checkoutAlert");
-            setTimeout(() => {
-              alert(`Pedido realizado com sucesso!\n\nID: ${resultado.pedidoID.substring(0, 8)}\nValor: R$ ${total.toFixed(2)}\n\nVocê receberá atualizações por WhatsApp`);
-              cart = [];
-              couponDiscount = 0;
-              updateCart();
-              closeCheckout();
-              document.getElementById("checkoutForm").reset();
-              document.getElementById("couponInput").value = "";
-              form.style.display = "block";
-              loading.classList.remove("active");
-            }, 1500);
-          } else {
-            showAlert(`❌ Erro: ${resultado.erro || "Falha no pagamento"}`, "checkoutAlert");
-            form.style.display = "block";
-            loading.classList.remove("active");
-          }
-        }
-      } catch (error) {
-        console.error("Erro:", error);
-        showAlert("❌ Erro ao processar pedido. Tente novamente.", "checkoutAlert");
+        // Limpar carrinho
+        setTimeout(() => {
+          cart = [];
+          couponDiscount = 0;
+          updateCart();
+          document.getElementById("checkoutForm").reset();
+          document.getElementById("couponInput").value = "";
+          form.style.display = "block";
+          loading.classList.remove("active");
+        }, 1500);
+      } else {
+        showAlert(`❌ Erro: ${dados.erro || "Não foi possível processar"}`, "checkoutAlert");
         form.style.display = "block";
         loading.classList.remove("active");
       }
-    });
+    } else {
+      // STRIPE - criar token
+      if (!stripe || !cardElement) {
+        initStripe();
+      }
+
+      const { token, error } = await stripe.createToken(cardElement);
+
+      if (error) {
+        showAlert(`❌ Erro no cartão: ${error.message}`, "checkoutAlert");
+        form.style.display = "block";
+        loading.classList.remove("active");
+        return;
+      }
+
+      const payload = JSON.stringify({
+        action: "criarPedidoStripe",
+        cliente: name,
+        telefone: phone,
+        endereco: `${address}, ${neighborhood}`,
+        itens: cart,
+        valorTotal: total,
+        tipoPagamento: "STRIPE",
+        observacoes: finalObs,
+        stripeToken: token.id
+      });
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        payload: payload
+      });
+
+      const resultado = await response.text();
+      
+      let dados = {};
+      try {
+        dados = JSON.parse(resultado);
+      } catch(e) {
+        dados = { sucesso: false, erro: "Resposta inválida" };
+      }
+
+      if (dados.sucesso) {
+        showAlert("✅ Pagamento processado!", "checkoutAlert");
+        setTimeout(() => {
+          alert(`Pedido confirmado!\n\nID: ${dados.pedidoID.substring(0, 8)}\nValor: R$ ${total.toFixed(2)}`);
+          cart = [];
+          couponDiscount = 0;
+          updateCart();
+          closeCheckout();
+          document.getElementById("checkoutForm").reset();
+          form.style.display = "block";
+          loading.classList.remove("active");
+        }, 1500);
+      } else {
+        showAlert(`❌ Erro: ${dados.erro || "Falha no pagamento"}`, "checkoutAlert");
+        form.style.display = "block";
+        loading.classList.remove("active");
+      }
+    }
+  } catch (error) {
+    console.error("Erro:", error);
+    showAlert("❌ Erro ao processar pedido", "checkoutAlert");
+    form.style.display = "block";
+    loading.classList.remove("active");
+  }
+});
+
 
     // ===== PIX =====
     function gerarQRCodePIX(valor) {
@@ -2200,6 +2215,7 @@ function loadProductsViaJSONP() {
   </script>
 </body>
 </html>
+
 
 
 
