@@ -223,14 +223,6 @@ async function loadProducts() {
   }
 }
 
-    
-    console.log("Total de produtos:", products.length);
-    renderMenu();
-  } catch (error) {
-    console.error("Erro:", error);
-    document.getElementById("menuSection").innerHTML = '<p style="grid-column: 1/-1; color: red; text-align: center;">❌ Erro ao carregar produtos: ' + error.message + '</p>';
-  }
-}
 
 
     function renderMenu() {
@@ -327,5 +319,6 @@ async function loadProducts() {
   </script>
 </body>
 </html>
+
 
 
