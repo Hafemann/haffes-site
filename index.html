@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pageTitle">Haffe's | Cardápio</title>
-  <style id="dynamicStyles">
+  <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --primary: #FF6600;
@@ -30,7 +30,8 @@
       border-bottom: 1px solid rgba(255, 102, 0, 0.2);
     }
     .logo-section { display: flex; align-items: center; gap: 12px; }
-    .logo-img { width: 50px; height: 50px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .logo-display { width: 50px; height: 50px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 28px; overflow: hidden; object-fit: cover; }
+    .logo-display img { width: 100%; height: 100%; object-fit: cover; }
     header h1 { color: var(--primary); font-size: 1.8em; }
     .header-actions { display: flex; gap: 10px; }
     .btn { background: var(--primary); color: #000; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
@@ -48,13 +49,12 @@
       position: relative;
     }
     .product-card:hover { border-color: var(--primary); transform: translateY(-5px); }
-    .product-card.edit-mode { border-color: var(--primary); }
     .product-img { width: 100%; height: 180px; background: var(--primary); object-fit: cover; }
     .product-info { padding: 16px; }
     .product-name { color: var(--primary); font-size: 1.1em; font-weight: bold; margin-bottom: 4px; }
     .product-price { color: #FFE4CC; font-size: 1.2em; font-weight: bold; }
     .btn-add { background: var(--primary); color: #000; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .product-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; }
+    .product-actions { position: absolute; top: 8px; right: 8px; }
     .btn-edit-product { background: #2196F3; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
     .cart-sidebar {
       position: sticky;
@@ -73,11 +73,8 @@
       margin-bottom: 8px;
       border-left: 3px solid var(--primary);
       border-radius: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
-    .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--secondary); }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
     .summary-row.total { color: #FFE4CC; font-size: 1.2em; font-weight: bold; border-top: 1px solid rgba(255, 102, 0, 0.2); padding-top: 10px; margin-top: 10px; }
     .btn-checkout { width: 100%; background: var(--primary); color: #000; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); }
@@ -111,6 +108,10 @@
     .config-tab.active { border-bottom-color: var(--primary); color: var(--primary); }
     .config-content { display: none; }
     .config-content.active { display: block; }
+    .image-preview { width: 100%; height: 100px; background: rgba(255, 102, 0, 0.1); border: 2px dashed rgba(255, 102, 0, 0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin: 10px 0; overflow: hidden; }
+    .image-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .file-label { display: inline-block; background: var(--primary); color: #000; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .file-label input { display: none; }
     @media (max-width: 1024px) {
       .wrapper { grid-template-columns: 1fr; }
       .cart-sidebar { position: static; }
@@ -120,14 +121,14 @@
 <body>
   <header>
     <div class="logo-section">
-      <div class="logo-img" id="logoDisplay">🍔</div>
+      <div class="logo-display" id="logoDisplay">🍔</div>
       <div>
         <h1 id="siteName">Haffe's Hamburgueria</h1>
         <p id="siteSubtitle" style="color: #FFE4CC; font-size: 0.9em; margin: 0;">Cardápio Online</p>
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn hidden" id="configBtn" onclick="toggleConfig()">⚙️ Configurações</button>
+      <button class="btn hidden" id="configBtn" onclick="toggleConfig()">⚙️ Config</button>
       <button class="btn hidden" id="editBtn" onclick="toggleEditMode()">✏️ Editar</button>
       <button class="btn hidden" id="logoutBtn" onclick="logout()">🚪 Sair</button>
       <button class="btn" id="loginBtn" onclick="openLoginModal()">🔐 Admin</button>
@@ -137,7 +138,7 @@
 
   <!-- CONFIG PANEL -->
   <div class="config-panel" id="configPanel">
-    <h2 style="color: var(--primary); margin-bottom: 20px;">⚙️ Configurações do Site</h2>
+    <h2 style="color: var(--primary); margin-bottom: 20px;">⚙️ Configurações</h2>
     
     <div class="config-tabs">
       <button class="config-tab active" onclick="switchConfigTab('general')">Geral</button>
@@ -155,10 +156,19 @@
         <label>Subtítulo</label>
         <input type="text" id="configSiteSubtitle" placeholder="Ex: Cardápio Online">
       </div>
+      
       <div class="form-group">
-        <label>Logo (Emoji ou símbolo)</label>
-        <input type="text" id="configLogo" placeholder="Ex: 🍔" maxlength="5">
+        <label>📷 Logo (Emoji OU PNG)</label>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+          <input type="text" id="configLogo" placeholder="Ex: 🍔" maxlength="5" style="flex: 1;">
+          <label class="file-label">
+            📁 PNG
+            <input type="file" id="logoFile" accept="image/png" onchange="handleLogoUpload()">
+          </label>
+        </div>
+        <div class="image-preview" id="logoPreview">Emoji ou PNG</div>
       </div>
+
       <div class="form-group">
         <label>Taxa de Entrega (R$)</label>
         <input type="number" id="configDelivery" step="0.01" min="0" placeholder="5.00">
@@ -168,41 +178,30 @@
     <!-- TAB: CORES -->
     <div class="config-content" id="colorsTab">
       <div class="form-group">
-        <label>Cor Primária (Hexadecimal)</label>
+        <label>Cor Primária</label>
         <input type="color" id="configPrimaryColor" value="#FF6600">
       </div>
-      <div class="form-group">
-        <label>Cor de Fundo</label>
-        <select id="configBackground">
-          <option value="dark">Escuro (padrão)</option>
-          <option value="light">Claro</option>
-          <option value="custom">Personalizado</option>
-        </select>
-      </div>
     </div>
 
-    <!-- TAB: PERGUNTAS OBRIGATÓRIAS -->
+    <!-- TAB: PERGUNTAS -->
     <div class="config-content" id="perguntasTab">
-      <p style="color: var(--secondary); margin-bottom: 16px;">Configure as perguntas obrigatórias que aparecem ao adicionar produtos:</p>
+      <p style="color: var(--secondary); margin-bottom: 16px;">Perguntas obrigatórias:</p>
       
-      <div class="form-group">
-        <label>
-          <input type="checkbox" id="pergMaionese" checked> Pergunta: Maionese Caseira?
-        </label>
-      </div>
-      <div class="form-group">
-        <label>
-          <input type="checkbox" id="pergKetchup" checked> Pergunta: Sachês de Ketchup e Maionese?
-        </label>
-      </div>
-      <div class="form-group">
-        <label>
-          <input type="checkbox" id="pergGuardanapo" checked> Pergunta: Guardanapos?
-        </label>
-      </div>
+      <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer;">
+        <input type="checkbox" id="pergMaionese" checked style="margin-right: 10px;">
+        Maionese Caseira?
+      </label>
+      <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer;">
+        <input type="checkbox" id="pergKetchup" checked style="margin-right: 10px;">
+        Sachês de Ketchup e Maionese?
+      </label>
+      <label style="display: flex; align-items: center; cursor: pointer;">
+        <input type="checkbox" id="pergGuardanapo" checked style="margin-right: 10px;">
+        Guardanapos?
+      </label>
     </div>
 
-    <button class="btn" onclick="saveConfig()" style="width: 100%; margin-top: 20px;">💾 Salvar Configurações</button>
+    <button class="btn" onclick="saveConfig()" style="width: 100%; margin-top: 20px; padding: 12px;">💾 Salvar</button>
   </div>
 
   <div class="wrapper" id="cardapioWrapper" style="display: grid;">
@@ -243,31 +242,26 @@
       <div class="modal-body">
         <p id="modalDesc" style="color: var(--secondary); margin-bottom: 15px;"></p>
 
-        <!-- PONTO DA CARNE -->
         <div id="meatSection" style="display: none;">
           <div class="section-title">🥩 Ponto da Carne</div>
           <div id="meatOptions"></div>
         </div>
 
-        <!-- PERGUNTAS OBRIGATÓRIAS -->
         <div id="perguntasSection" style="display: none;">
           <div class="section-title">❓ Perguntas</div>
           <div id="perguntasOptions"></div>
         </div>
 
-        <!-- ADICIONAIS -->
         <div id="adicionaisSection" style="display: none;">
           <div class="section-title">➕ Adicionais</div>
           <div id="adicionaisOptions"></div>
         </div>
 
-        <!-- OBSERVAÇÕES -->
         <div class="form-group">
-          <label>📝 Observações (opcional)</label>
-          <textarea id="modalObservations" placeholder="Ex: Sem cebola, extra alface..." style="min-height: 60px;"></textarea>
+          <label>📝 Observações</label>
+          <textarea id="modalObservations" placeholder="Ex: Sem cebola..." style="min-height: 60px;"></textarea>
         </div>
 
-        <!-- QUANTIDADE -->
         <div class="section-title">📦 Quantidade</div>
         <div style="display: flex; align-items: center; gap: 12px; background: rgba(255, 102, 0, 0.1); padding: 10px; border-radius: 6px;">
           <button class="btn" onclick="decreaseQty()" style="width: 36px; height: 36px; padding: 0;">−</button>
@@ -288,11 +282,11 @@
   <div id="loginModal" class="modal">
     <div class="modal-content" style="max-width: 400px;">
       <div class="modal-header">
-        <h2>🔐 Acesso Admin</h2>
+        <h2>🔐 Admin</h2>
         <button class="close-btn" onclick="closeLoginModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <input type="password" id="passwordInput" style="width: 100%; padding: 12px; margin-bottom: 16px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text);" placeholder="Digite a senha" onkeypress="if(event.key==='Enter') authenticate()">
+        <input type="password" id="passwordInput" style="width: 100%; padding: 12px; margin-bottom: 16px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text);" placeholder="Senha" onkeypress="if(event.key==='Enter') authenticate()">
         <button class="btn" onclick="authenticate()" style="width: 100%;">Entrar</button>
         <div id="loginAlert"></div>
       </div>
@@ -303,7 +297,7 @@
   <div id="checkoutModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🛍️ Finalizar Pedido</h2>
+        <h2>🛍️ Finalizar</h2>
         <button class="close-btn" onclick="closeCheckout()">&times;</button>
       </div>
       <div class="modal-body">
@@ -311,23 +305,19 @@
         <form id="checkoutForm" onsubmit="finalizarPedido(event)">
           <div class="form-group">
             <label>👤 Nome *</label>
-            <input type="text" id="clientName" required placeholder="Seu nome">
+            <input type="text" id="clientName" required>
           </div>
           <div class="form-group">
             <label>📱 WhatsApp *</label>
-            <input type="tel" id="clientPhone" required placeholder="(11) 99999-9999">
+            <input type="tel" id="clientPhone" required>
           </div>
           <div class="form-group">
             <label>📍 Endereço *</label>
-            <input type="text" id="clientAddress" required placeholder="Rua, número">
+            <input type="text" id="clientAddress" required>
           </div>
           <div class="form-group">
             <label>🏘️ Bairro *</label>
-            <input type="text" id="clientNeighborhood" required placeholder="Bairro">
-          </div>
-          <div class="form-group">
-            <label>📝 Observação</label>
-            <textarea id="clientObservation" style="min-height: 60px;" placeholder="Observações gerais do pedido..."></textarea>
+            <input type="text" id="clientNeighborhood" required>
           </div>
           <button type="submit" class="btn-checkout" style="width: 100%;">✓ Confirmar - R$ <span id="checkoutTotal">0,00</span></button>
         </form>
@@ -339,7 +329,7 @@
   <div id="editModal" class="modal">
     <div class="modal-content" style="max-width: 600px;">
       <div class="modal-header">
-        <h2>✏️ Editar Produto</h2>
+        <h2>✏️ Editar</h2>
         <button class="close-btn" onclick="closeEditModal()">&times;</button>
       </div>
       <div class="modal-body">
@@ -347,12 +337,10 @@
         <form id="editForm" onsubmit="saveProduct(event)">
           <div class="form-group">
             <label>📷 Imagem</label>
-            <div style="width: 100%; height: 150px; background: rgba(255, 102, 0, 0.1); border: 2px dashed rgba(255, 102, 0, 0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden;" id="imagePreview">
-              <span style="color: var(--secondary);">Nenhuma imagem</span>
-            </div>
-            <label style="display: inline-block; background: var(--primary); color: #000; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">
-              📁 Escolher
-              <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload()" style="display: none;">
+            <div class="image-preview" id="imagePreview">Nenhuma</div>
+            <label class="file-label">
+              📁 Upload
+              <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload()">
             </label>
           </div>
           <div class="form-group">
@@ -379,12 +367,9 @@
 
           <div class="section-title">🥩 Tem Ponto da Carne?</div>
           <label class="option-label">
-            <input type="checkbox" id="editTemMeat" onchange="toggleMeatOptions()">
-            Sim, esse produto tem opções de ponto
+            <input type="checkbox" id="editTemMeat">
+            Sim
           </label>
-          <div id="meatPointOptions" style="display: none; margin-bottom: 16px;">
-            <p style="color: var(--secondary); font-size: 0.9em; margin-bottom: 10px;">O produto terá opções de ponto automaticamente</p>
-          </div>
 
           <div class="section-title">➕ Adicionais</div>
           <div id="adicionaisList" style="margin-bottom: 16px;"></div>
@@ -392,7 +377,7 @@
             <input type="text" id="novoAdicionalNome" placeholder="Nome" style="padding: 10px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text);">
             <input type="number" id="novoAdicionalPreco" placeholder="Preço" step="0.01" min="0" style="padding: 10px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text);">
           </div>
-          <button type="button" class="btn" onclick="addAdicional()" style="width: 100%; margin-bottom: 20px;">➕ Adicionar Opcional</button>
+          <button type="button" class="btn" onclick="addAdicional()" style="width: 100%; margin-bottom: 20px;">➕ Adicionar</button>
 
           <div style="display: flex; gap: 10px;">
             <button type="button" class="btn" style="flex: 1; background: #555;" onclick="closeEditModal()">Cancelar</button>
@@ -406,7 +391,7 @@
   <script>
     const ADMIN_PASSWORD = "1234";
     const SHEETS_URL = "https://docs.google.com/spreadsheets/d/1mepco27k4xrhePSJg0EizfWxLDjKV54Rv9-XH9RA1VU/gviz/tq?tqx=out:csv&sheet=Produtos";
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAG5P_BxZeMHHzmcIx5vq7dktVUPkh7KPxkXUJzquHgor02N799Xibr-fx4TCq-VPrZA/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUIYim8nJSgYF18INAFZMqcDcWWv1UrGCJDTFvVoMv9s5k51qDzAxqe_ETtcyqleWH6Q/exec";
 
     let products = [];
     let cart = [];
@@ -423,6 +408,7 @@
       siteName: "Haffe's Hamburgueria",
       siteSubtitle: "Cardápio Online",
       logo: "🍔",
+      logoImage: null,
       primaryColor: "#FF6600",
       deliveryFee: 5.00,
       pergMaionese: true,
@@ -430,29 +416,36 @@
       pergGuardanapo: true
     };
 
-    // ===== CARREGAR CONFIG =====
+    // ===== CARREGAR CONFIG DO APPS SCRIPT =====
     async function loadConfig() {
       try {
         const response = await fetch(APPS_SCRIPT_URL + "?action=getConfig");
         const data = await response.json();
-        config = {...config, ...data};
+        if (data && Object.keys(data).length > 0) {
+          config = {...config, ...data};
+        }
         applyConfig();
       } catch(e) {
-        console.log("Usando configurações padrão");
+        console.log("Usando config padrão");
         applyConfig();
       }
     }
 
     function applyConfig() {
-      document.getElementById("pageTitle").textContent = config.siteName + " | Cardápio";
+      document.getElementById("pageTitle").textContent = config.siteName;
       document.getElementById("siteName").textContent = config.siteName;
       document.getElementById("siteSubtitle").textContent = config.siteSubtitle;
-      document.getElementById("logoDisplay").textContent = config.logo;
-      document.getElementById("deliveryFee").textContent = `R$ ${parseFloat(config.deliveryFee || 5).toFixed(2)}`;
       
+      const logoDisplay = document.getElementById("logoDisplay");
+      if (config.logoImage) {
+        logoDisplay.innerHTML = `<img src="${config.logoImage}" alt="Logo">`;
+      } else {
+        logoDisplay.textContent = config.logo || "🍔";
+      }
+      
+      document.getElementById("deliveryFee").textContent = `R$ ${parseFloat(config.deliveryFee || 5).toFixed(2)}`;
       document.documentElement.style.setProperty('--primary', config.primaryColor || '#FF6600');
       
-      // Carregar valores nas inputs de config
       if(isAdmin) {
         document.getElementById("configSiteName").value = config.siteName;
         document.getElementById("configSiteSubtitle").value = config.siteSubtitle;
@@ -462,31 +455,48 @@
         document.getElementById("pergMaionese").checked = config.pergMaionese !== false;
         document.getElementById("pergKetchup").checked = config.pergKetchup !== false;
         document.getElementById("pergGuardanapo").checked = config.pergGuardanapo !== false;
+        
+        if (config.logoImage) {
+          document.getElementById("logoPreview").innerHTML = `<img src="${config.logoImage}">`;
+        }
+      }
+    }
+
+    function handleLogoUpload() {
+      const file = document.getElementById("logoFile").files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          config.logoImage = e.target.result;
+          document.getElementById("logoPreview").innerHTML = `<img src="${config.logoImage}">`;
+        };
+        reader.readAsDataURL(file);
       }
     }
 
     async function saveConfig() {
-      const newConfig = {
-        siteName: document.getElementById("configSiteName").value,
-        siteSubtitle: document.getElementById("configSiteSubtitle").value,
-        logo: document.getElementById("configLogo").value,
-        primaryColor: document.getElementById("configPrimaryColor").value,
-        deliveryFee: parseFloat(document.getElementById("configDelivery").value) || 5,
-        pergMaionese: document.getElementById("pergMaionese").checked,
-        pergKetchup: document.getElementById("pergKetchup").checked,
-        pergGuardanapo: document.getElementById("pergGuardanapo").checked
-      };
+      config.siteName = document.getElementById("configSiteName").value;
+      config.siteSubtitle = document.getElementById("configSiteSubtitle").value;
+      config.logo = document.getElementById("configLogo").value;
+      config.primaryColor = document.getElementById("configPrimaryColor").value;
+      config.deliveryFee = parseFloat(document.getElementById("configDelivery").value) || 5;
+      config.pergMaionese = document.getElementById("pergMaionese").checked;
+      config.pergKetchup = document.getElementById("pergKetchup").checked;
+      config.pergGuardanapo = document.getElementById("pergGuardanapo").checked;
 
       try {
-        await fetch(APPS_SCRIPT_URL, {
+        const response = await fetch(APPS_SCRIPT_URL, {
           method: "POST",
-          payload: JSON.stringify({action: "salvarConfig", ...newConfig})
+          payload: JSON.stringify({action: "salvarConfig", ...config})
         });
-        config = newConfig;
-        applyConfig();
-        alert("✅ Configurações salvas!");
+        
+        const resultado = await response.json();
+        if (resultado.sucesso) {
+          alert("✅ Configurações salvas!");
+          applyConfig();
+        }
       } catch(e) {
-        alert("❌ Erro ao salvar");
+        alert("❌ Erro ao salvar: " + e.message);
       }
     }
 
@@ -526,7 +536,7 @@
         document.getElementById("configBtn").classList.remove("hidden");
         loadConfig();
       } else {
-        document.getElementById("loginAlert").innerHTML = '<div class="alert error">❌ Senha incorreta</div>';
+        document.getElementById("loginAlert").innerHTML = '<div class="alert error">❌ Errada</div>';
       }
     }
 
@@ -565,9 +575,7 @@
             }
 
             let adicionais = [];
-            try {
-              adicionais = JSON.parse(values[6] || '[]');
-            } catch(e) {}
+            try { adicionais = JSON.parse(values[6] || '[]'); } catch(e) {}
             
             let temMeat = false;
             try {
@@ -591,21 +599,21 @@
         renderMenu();
       } catch (error) {
         console.error("Erro:", error);
-        document.getElementById("menuSection").innerHTML = '<p style="grid-column: 1/-1; color: #ff6b6b; text-align: center; padding: 40px;">❌ Erro ao carregar</p>';
+        document.getElementById("menuSection").innerHTML = '<p style="grid-column: 1/-1; color: #ff6b6b;">❌ Erro</p>';
       }
     }
 
     function renderMenu() {
       const section = document.getElementById("menuSection");
       if (!products || products.length === 0) {
-        section.innerHTML = '<p style="grid-column: 1/-1; color: var(--secondary); text-align: center; padding: 40px;">Nenhum produto</p>';
+        section.innerHTML = '<p style="grid-column: 1/-1;">Nenhum produto</p>';
         return;
       }
       
       section.innerHTML = products.map(p => `
-        <div class="product-card ${isAdmin ? 'edit-mode' : ''}">
+        <div class="product-card">
           ${isAdmin ? `<div class="product-actions"><button class="btn-edit-product" onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">✏️</button></div>` : ''}
-          <img src="${p.foto || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22180%22%3E%3Crect width=%22300%22 height=%22180%22 fill=%22%23FF6600%22/%3E%3C/svg%3E'}" class="product-img" alt="${p.nome}">
+          <img src="${p.foto || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22180%22%3E%3Crect fill=%22%23FF6600%22 width=%22300%22 height=%22180%22/%3E%3C/svg%3E'}" class="product-img">
           <div onclick="${isAdmin ? '' : `openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})`}" style="cursor: ${isAdmin ? 'default' : 'pointer'};">
             <div class="product-info">
               <div class="product-name">${p.nome}</div>
@@ -637,12 +645,11 @@
       document.getElementById("qtyDisplay").textContent = "1";
       document.getElementById("modalObservations").value = "";
       
-      // PONTO DA CARNE
+      // PONTO
       const meatSection = document.getElementById("meatSection");
-      const meatOptions = document.getElementById("meatOptions");
       if (product.temMeat) {
         meatSection.style.display = "block";
-        meatOptions.innerHTML = `
+        document.getElementById("meatOptions").innerHTML = `
           <label class="option-label">
             <input type="radio" name="meatPoint" value="meiaMal" onchange="selectedMeatPoint='Meia Mal'">
             Meia Mal
@@ -661,24 +668,21 @@
         meatSection.style.display = "none";
       }
 
-      // PERGUNTAS OBRIGATÓRIAS
+      // PERGUNTAS
       const perguntasSection = document.getElementById("perguntasSection");
-      const perguntasOptions = document.getElementById("perguntasOptions");
-      let temPerguntas = false;
       let perguntasHTML = "";
 
       if (config.pergMaionese) {
         perguntasHTML += `
           <label class="option-label">
             <input type="radio" name="maionese" value="sim" checked onchange="selectedPerguntas.maionese='Sim'">
-            <span style="flex: 1; margin-left: 8px;">Quer Maionese Caseira?</span>
+            Maionese Caseira?
           </label>
           <label class="option-label">
             <input type="radio" name="maionese" value="nao" onchange="selectedPerguntas.maionese='Não'">
-            <span style="flex: 1; margin-left: 8px;">Não</span>
+            Não
           </label>
         `;
-        temPerguntas = true;
         selectedPerguntas.maionese = "Sim";
       }
 
@@ -686,14 +690,13 @@
         perguntasHTML += `
           <label class="option-label">
             <input type="radio" name="ketchup" value="sim" checked onchange="selectedPerguntas.ketchup='Sim'">
-            <span style="flex: 1; margin-left: 8px;">Quer Sachês de Ketchup e Maionese?</span>
+            Sachês Ketchup e Maionese?
           </label>
           <label class="option-label">
             <input type="radio" name="ketchup" value="nao" onchange="selectedPerguntas.ketchup='Não'">
-            <span style="flex: 1; margin-left: 8px;">Não</span>
+            Não
           </label>
         `;
-        temPerguntas = true;
         selectedPerguntas.ketchup = "Sim";
       }
 
@@ -701,36 +704,31 @@
         perguntasHTML += `
           <label class="option-label">
             <input type="radio" name="guardanapo" value="sim" checked onchange="selectedPerguntas.guardanapo='Sim'">
-            <span style="flex: 1; margin-left: 8px;">Quer Guardanapos?</span>
+            Guardanapos?
           </label>
           <label class="option-label">
             <input type="radio" name="guardanapo" value="nao" onchange="selectedPerguntas.guardanapo='Não'">
-            <span style="flex: 1; margin-left: 8px;">Não</span>
+            Não
           </label>
         `;
-        temPerguntas = true;
         selectedPerguntas.guardanapo = "Sim";
       }
 
-      if (temPerguntas) {
+      if (perguntasHTML) {
         perguntasSection.style.display = "block";
-        perguntasOptions.innerHTML = perguntasHTML;
+        document.getElementById("perguntasOptions").innerHTML = perguntasHTML;
       } else {
         perguntasSection.style.display = "none";
       }
 
       // ADICIONAIS
       const adicionaisSection = document.getElementById("adicionaisSection");
-      const adicionaisOptions = document.getElementById("adicionaisOptions");
-      
       if (product.adicionais && product.adicionais.length > 0) {
         adicionaisSection.style.display = "block";
-        adicionaisOptions.innerHTML = product.adicionais.map(a => `
+        document.getElementById("adicionaisOptions").innerHTML = product.adicionais.map(a => `
           <label class="option-label">
             <input type="checkbox" value="${a.nome}" data-price="${a.preco}" onchange="updateAdicionais()">
-            <span style="flex: 1; margin-left: 8px;">
-              <strong>${a.nome}</strong> - R$ ${a.preco.toFixed(2)}
-            </span>
+            ${a.nome} - R$ ${a.preco.toFixed(2)}
           </label>
         `).join("");
       } else {
@@ -747,8 +745,8 @@
 
     function updateAdicionais() {
       selectedAdicionais = {};
-      document.querySelectorAll('#adicionaisOptions input[type="checkbox"]:checked').forEach(checkbox => {
-        selectedAdicionais[checkbox.value] = parseFloat(checkbox.dataset.price);
+      document.querySelectorAll('#adicionaisOptions input:checked').forEach(cb => {
+        selectedAdicionais[cb.value] = parseFloat(cb.dataset.price);
       });
       updateModalPrice();
     }
@@ -765,8 +763,7 @@
       document.getElementById("editTemMeat").checked = product.temMeat === true;
       
       if (currentImage) {
-        const preview = document.getElementById("imagePreview");
-        preview.innerHTML = `<img src="${currentImage}" alt="Preview">`;
+        document.getElementById("imagePreview").innerHTML = `<img src="${currentImage}">`;
       }
       
       renderAdicionaisList();
@@ -787,15 +784,10 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           currentImage = e.target.result;
-          const preview = document.getElementById("imagePreview");
-          preview.innerHTML = `<img src="${currentImage}" alt="Preview">`;
+          document.getElementById("imagePreview").innerHTML = `<img src="${currentImage}">`;
         };
         reader.readAsDataURL(file);
       }
-    }
-
-    function toggleMeatOptions() {
-      document.getElementById("meatPointOptions").style.display = document.getElementById("editTemMeat").checked ? "block" : "none";
     }
 
     function addAdicional() {
@@ -803,7 +795,7 @@
       const preco = parseFloat(document.getElementById("novoAdicionalPreco").value) || 0;
 
       if (!nome) {
-        document.getElementById("editAlert").innerHTML = '<div class="alert error">❌ Preencha o nome</div>';
+        document.getElementById("editAlert").innerHTML = '<div class="alert error">❌ Nome</div>';
         return;
       }
 
@@ -821,14 +813,14 @@
     function renderAdicionaisList() {
       const lista = document.getElementById("adicionaisList");
       if (temporaryAdicionais.length === 0) {
-        lista.innerHTML = '<p style="color: var(--secondary); text-align: center; font-size: 0.9em;">Nenhum adicional</p>';
+        lista.innerHTML = '<p style="color: var(--secondary); text-align: center; font-size: 0.9em;">Nenhum</p>';
         return;
       }
 
       lista.innerHTML = temporaryAdicionais.map((a, i) => `
-        <div style="background: rgba(255, 102, 0, 0.08); padding: 10px; margin-bottom: 8px; border-radius: 6px; border: 1px solid rgba(255, 102, 0, 0.2); display: flex; justify-content: space-between; align-items: center;">
+        <div style="background: rgba(255, 102, 0, 0.08); padding: 10px; margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between;">
           <div>
-            <div style="color: var(--text); font-weight: bold;">${a.nome}</div>
+            <div style="font-weight: bold;">${a.nome}</div>
             <div style="color: var(--secondary); font-size: 0.9em;">+R$ ${a.preco.toFixed(2)}</div>
           </div>
           <button type="button" style="background: #d32f2f; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer;" onclick="removeAdicional(${i})">✕</button>
@@ -845,8 +837,8 @@
       const categoria = document.getElementById("editCategoria").value;
       const temMeat = document.getElementById("editTemMeat").checked;
 
-      if (!nome || !descricao || !preco || !categoria) {
-        document.getElementById("editAlert").innerHTML = '<div class="alert error">❌ Preencha todos</div>';
+      if (!nome || !descricao || !preco) {
+        document.getElementById("editAlert").innerHTML = '<div class="alert error">❌ Preencha tudo</div>';
         return;
       }
 
@@ -872,7 +864,7 @@
             })
           });
         } catch(e) {
-          console.error("Erro ao salvar:", e);
+          console.error("Erro:", e);
         }
         
         document.getElementById("editAlert").innerHTML = '<div class="alert success">✅ Salvo!</div>';
@@ -905,7 +897,6 @@
       const telefone = document.getElementById("clientPhone").value.trim();
       const endereco = document.getElementById("clientAddress").value.trim();
       const bairro = document.getElementById("clientNeighborhood").value.trim();
-      const obs = document.getElementById("clientObservation").value.trim();
 
       if (!nome || !telefone || !endereco || !bairro) {
         document.getElementById("checkoutAlert").innerHTML = '<div class="alert error">❌ Preencha tudo</div>';
@@ -925,27 +916,23 @@
             telefone: telefone,
             endereco: `${endereco}, ${bairro}`,
             itens: cart,
-            valorTotal: total,
-            observacoes: obs
+            valorTotal: total
           })
         });
 
         const resultado = await response.json();
 
         if (resultado.sucesso) {
-          document.getElementById("checkoutAlert").innerHTML = '<div class="alert success">✅ Pedido criado!</div>';
-          alert(`Pedido confirmado!\nID: ${resultado.pedidoID}\nValor: R$ ${total.toFixed(2)}\n\nAtualizações por WhatsApp`);
-          
+          alert(`✅ Pedido criado!\nID: ${resultado.pedidoID}\nValor: R$ ${total.toFixed(2)}`);
           cart = [];
           updateCart();
           closeCheckout();
           document.getElementById("checkoutForm").reset();
         } else {
-          document.getElementById("checkoutAlert").innerHTML = '<div class="alert error">❌ Erro: ' + resultado.erro + '</div>';
+          document.getElementById("checkoutAlert").innerHTML = '<div class="alert error">❌ Erro</div>';
         }
       } catch(error) {
-        console.error("Erro:", error);
-        document.getElementById("checkoutAlert").innerHTML = '<div class="alert error">❌ Erro ao processar</div>';
+        document.getElementById("checkoutAlert").innerHTML = '<div class="alert error">❌ Erro</div>';
       }
     }
 
@@ -976,22 +963,15 @@
       const adicionalPrice = Object.values(selectedAdicionais).reduce((a, b) => a + b, 0);
       const itemPrice = currentProduct.preco + adicionalPrice;
       
-      const existing = cart.find(item => item.id === currentProduct.id && item.meatPoint === selectedMeatPoint && item.observacoes === document.getElementById("modalObservations").value);
-      
-      if (existing) {
-        existing.qty += currentQty;
-      } else {
-        cart.push({
-          id: currentProduct.id,
-          nome: currentProduct.nome,
-          preco: itemPrice,
-          qty: currentQty,
-          meatPoint: selectedMeatPoint,
-          perguntas: selectedPerguntas,
-          adicionaisSelecionados: selectedAdicionais,
-          observacoes: document.getElementById("modalObservations").value
-        });
-      }
+      cart.push({
+        id: currentProduct.id,
+        nome: currentProduct.nome,
+        preco: itemPrice,
+        qty: currentQty,
+        meatPoint: selectedMeatPoint,
+        perguntas: selectedPerguntas,
+        observacoes: document.getElementById("modalObservations").value
+      });
       
       updateCart();
       closeModal();
@@ -1005,7 +985,7 @@
     function updateCart() {
       const cartDiv = document.getElementById("cartItems");
       if (cart.length === 0) {
-        cartDiv.innerHTML = '<p style="color: var(--secondary); text-align: center; font-size: 0.9em;">Carrinho vazio</p>';
+        cartDiv.innerHTML = '<p style="color: var(--secondary); text-align: center; font-size: 0.9em;">Vazio</p>';
         document.getElementById("subtotal").textContent = "R$ 0,00";
         document.getElementById("total").textContent = `R$ ${parseFloat(config.deliveryFee || 5).toFixed(2)}`;
         return;
@@ -1016,17 +996,12 @@
         const total = item.preco * item.qty;
         subtotal += total;
         return `
-          <div style="background: rgba(255, 102, 0, 0.1); padding: 10px; margin-bottom: 8px; border-left: 3px solid var(--primary); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="flex: 1;">
-              <div style="color: var(--text); font-weight: bold;">${item.nome}</div>
-              <div style="color: var(--secondary); font-size: 0.9em;">Qtd: ${item.qty}</div>
-              ${item.meatPoint ? `<div style="color: var(--secondary); font-size: 0.8em;">🥩 ${item.meatPoint}</div>` : ''}
-              ${item.observacoes ? `<div style="color: var(--secondary); font-size: 0.8em;">📝 ${item.observacoes}</div>` : ''}
+          <div style="background: rgba(255, 102, 0, 0.1); padding: 10px; margin-bottom: 8px; border-left: 3px solid var(--primary); border-radius: 6px;">
+            <div style="display: flex; justify-content: space-between;">
+              <div style="font-weight: bold;">${item.nome}</div>
+              <button style="background: #d32f2f; color: white; border: none; padding: 2px 6px; cursor: pointer; border-radius: 3px; font-size: 0.8em;" onclick="removeFromCart(${index})">✕</button>
             </div>
-            <div style="text-align: right; display: flex; gap: 8px; align-items: center;">
-              <div style="color: #FFE4CC; font-weight: bold;">R$ ${total.toFixed(2)}</div>
-              <button style="background: #d32f2f; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 0.8em;" onclick="removeFromCart(${index})">✕</button>
-            </div>
+            <div style="color: var(--secondary); font-size: 0.85em;">Qtd: ${item.qty} | R$ ${total.toFixed(2)}</div>
           </div>
         `;
       }).join("");
