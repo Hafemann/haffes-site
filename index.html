@@ -57,10 +57,8 @@
     .product-price { color: #FFE4CC; font-size: 1.2em; font-weight: bold; }
     .btn-add { background: var(--primary); color: #000; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
     .btn-add:hover { background: #ff8533; }
-    .btn-add:active { transform: scale(0.95); }
     .product-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; }
-    .btn-edit-product { background: #2196F3; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; transition: 0.2s; }
-    .btn-edit-product:hover { background: #21BBF3; }
+    .btn-edit-product { background: #2196F3; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
     .cart-sidebar {
       position: sticky;
       top: 100px;
@@ -71,7 +69,7 @@
       padding: 20px;
       backdrop-filter: blur(10px);
     }
-    .cart-title { color: var(--primary); font-size: 1.3em; margin-bottom: 15px; font-weight: bold; text-shadow: 0 0 10px rgba(255, 102, 0, 0.2); }
+    .cart-title { color: var(--primary); font-size: 1.3em; margin-bottom: 15px; font-weight: bold; }
     .cart-items { max-height: 300px; overflow-y: auto; margin-bottom: 15px; }
     .cart-item {
       background: rgba(255, 102, 0, 0.1);
@@ -83,40 +81,32 @@
       justify-content: space-between;
       align-items: center;
     }
-    .cart-item-name { font-weight: bold; }
-    .cart-item-qty { color: var(--secondary); font-size: 0.9em; margin-top: 3px; }
     .cart-summary { border-top: 1px solid rgba(255, 102, 0, 0.2); padding-top: 12px; }
     .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--secondary); font-size: 0.95em; }
     .summary-row.total { color: #FFE4CC; font-size: 1.2em; font-weight: bold; border-top: 1px solid rgba(255, 102, 0, 0.2); padding-top: 10px; margin-top: 10px; }
     .btn-checkout { width: 100%; background: var(--primary); color: #000; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-    .btn-checkout:hover { background: #ff8533; transform: translateY(-2px); }
+    .btn-checkout:hover { background: #ff8533; }
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); }
     .modal.active { display: flex; align-items: center; justify-content: center; }
-    .modal-content { background: var(--dark); max-width: 500px; width: 90%; border-radius: 12px; border: 1px solid rgba(255, 102, 0, 0.3); max-height: 85vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+    .modal-content { background: var(--dark); max-width: 550px; width: 90%; border-radius: 12px; border: 1px solid rgba(255, 102, 0, 0.3); max-height: 85vh; overflow-y: auto; animation: slideUp 0.3s ease; }
     @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .modal-header { background: linear-gradient(90deg, var(--primary), #ff8533); padding: 16px; display: flex; justify-content: space-between; align-items: center; }
     .modal-header h2 { color: #000; margin: 0; }
-    .close-btn { background: none; border: none; color: #000; font-size: 1.5em; cursor: pointer; transition: 0.2s; }
-    .close-btn:hover { transform: rotate(90deg); }
+    .close-btn { background: none; border: none; color: #000; font-size: 1.5em; cursor: pointer; }
     .modal-body { padding: 20px; }
-    .section-title { color: var(--primary); font-size: 1em; margin: 16px 0 10px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255, 102, 0, 0.2); padding-bottom: 6px; }
+    .section-title { color: var(--primary); font-size: 0.95em; margin: 16px 0 10px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255, 102, 0, 0.2); padding-bottom: 6px; }
     .quantity-selector { display: flex; align-items: center; gap: 12px; margin: 16px 0; background: rgba(255, 102, 0, 0.1); padding: 10px; border-radius: 6px; }
-    .qty-btn { background: var(--primary); color: #000; border: none; width: 36px; height: 36px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.1em; transition: 0.2s; }
-    .qty-btn:hover { background: #ff8533; transform: scale(1.1); }
+    .qty-btn { background: var(--primary); color: #000; border: none; width: 36px; height: 36px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.1em; }
     .qty-display { font-size: 1.3em; font-weight: bold; color: #FFE4CC; flex: 1; text-align: center; }
+    .option-label { display: flex; align-items: center; padding: 10px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.15); border-radius: 6px; margin-bottom: 8px; cursor: pointer; }
+    .option-label input { accent-color: var(--primary); margin-right: 10px; }
+    .option-text { flex: 1; }
+    .option-name { color: var(--text); font-weight: 500; }
+    .option-price { color: #FFE4CC; font-size: 0.9em; margin-left: 8px; }
     .modal-footer { padding: 16px; border-top: 1px solid rgba(255, 102, 0, 0.2); display: flex; gap: 10px; }
-    .modal-footer button { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .modal-footer button { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .btn-cancel { background: #555; color: white; }
-    .btn-cancel:hover { background: #666; }
     .btn-confirm { background: var(--primary); color: #000; }
-    .btn-confirm:hover { background: #ff8533; }
-    .loading { text-align: center; padding: 40px; }
-    .spinner { width: 40px; height: 40px; border: 4px solid rgba(255, 102, 0, 0.2); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .remove-btn { background: #d32f2f; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 0.8em; transition: 0.2s; }
-    .remove-btn:hover { background: #f44336; }
-    
-    /* Form Styles */
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; color: var(--primary); font-weight: bold; margin-bottom: 6px; font-size: 0.9em; }
     .form-group input, .form-group textarea, .form-group select {
@@ -135,16 +125,10 @@
       background: rgba(255, 102, 0, 0.12);
       box-shadow: 0 0 10px rgba(255, 102, 0, 0.15);
     }
-    .form-group textarea { min-height: 70px; resize: vertical; }
-    
-    /* Image Upload */
     .image-preview { width: 100%; height: 150px; background: rgba(255, 102, 0, 0.1); border: 2px dashed rgba(255, 102, 0, 0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; }
     .image-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .file-label { display: inline-block; background: var(--primary); color: #000; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-    .file-label:hover { background: #ff8533; }
+    .file-label { display: inline-block; background: var(--primary); color: #000; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .file-label input { display: none; }
-    
-    /* Adicionais List */
     .adicional-item {
       background: rgba(255, 102, 0, 0.08);
       padding: 10px;
@@ -155,27 +139,13 @@
       justify-content: space-between;
       align-items: center;
     }
-    .adicional-info { flex: 1; }
-    .adicional-name { color: var(--text); font-weight: bold; }
-    .adicional-price { color: var(--secondary); font-size: 0.9em; }
-    .btn-remove-adicional { background: #d32f2f; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
-    
-    /* Alert */
     .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid; }
     .alert.success { background: rgba(76, 175, 80, 0.15); border-left-color: #4caf50; color: #90ee90; }
     .alert.error { background: rgba(211, 47, 47, 0.15); border-left-color: #d32f2f; color: #ff6b6b; }
-    
-    /* Login Modal */
-    .login-container { text-align: center; }
-    .login-container h2 { margin-bottom: 20px; color: var(--primary); }
     .login-input { width: 100%; padding: 12px; margin-bottom: 16px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text); }
-    .login-btn { width: 100%; padding: 12px; background: var(--primary); color: #000; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .login-btn:hover { background: #ff8533; }
-    
     @media (max-width: 1024px) {
       .wrapper { grid-template-columns: 1fr; }
       .cart-sidebar { position: static; }
-      .menu-section { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -195,7 +165,7 @@
 
   <div class="wrapper">
     <div class="menu-section" id="menuSection">
-      <div class="loading"><div class="spinner"></div><p>Carregando produtos...</p></div>
+      <div style="text-align: center; padding: 40px; color: var(--primary);"><div style="width: 40px; height: 40px; border: 4px solid rgba(255, 102, 0, 0.2); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div><p>Carregando produtos...</p></div>
     </div>
 
     <div class="cart-sidebar">
@@ -217,7 +187,7 @@
           <span id="total">R$ 5,00</span>
         </div>
       </div>
-      <button class="btn-checkout" id="checkoutBtn" onclick="alert('Sistema de pagamento em desenvolvimento')">🛍️ Finalizar Pedido</button>
+      <button class="btn-checkout" id="checkoutBtn" onclick="openCheckout()">🛍️ Finalizar Pedido</button>
     </div>
   </div>
 
@@ -229,8 +199,13 @@
         <button class="close-btn" onclick="closeModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <p id="modalDesc" style="color: var(--secondary); margin-bottom: 15px; line-height: 1.5;"></p>
+        <p id="modalDesc" style="color: var(--secondary); margin-bottom: 15px;"></p>
         
+        <div id="adicionaisSection" style="display: none;">
+          <div class="section-title">➕ Adicionais</div>
+          <div id="adicionaisOptions"></div>
+        </div>
+
         <div class="section-title">📦 Quantidade</div>
         <div class="quantity-selector">
           <button class="qty-btn" onclick="decreaseQty()">−</button>
@@ -255,11 +230,9 @@
         <button class="close-btn" onclick="closeLoginModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="login-container">
-          <input type="password" id="passwordInput" class="login-input" placeholder="Digite a senha" onkeypress="if(event.key==='Enter') authenticate()">
-          <button class="login-btn" onclick="authenticate()">Entrar</button>
-          <div id="loginAlert"></div>
-        </div>
+        <input type="password" id="passwordInput" class="login-input" placeholder="Digite a senha" onkeypress="if(event.key==='Enter') authenticate()">
+        <button class="btn" onclick="authenticate()" style="width: 100%;">Entrar</button>
+        <div id="loginAlert"></div>
       </div>
     </div>
   </div>
@@ -276,24 +249,24 @@
         
         <form id="editForm" onsubmit="saveProduct(event)">
           <div class="form-group">
-            <label>📷 Imagem do Produto</label>
+            <label>📷 Imagem</label>
             <div class="image-preview" id="imagePreview">
               <span style="color: var(--secondary);">Nenhuma imagem</span>
             </div>
             <label class="file-label">
-              📁 Escolher Imagem
+              📁 Escolher
               <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload()">
             </label>
           </div>
 
           <div class="form-group">
-            <label>Nome do Produto *</label>
+            <label>Nome *</label>
             <input type="text" id="editNome" required>
           </div>
 
           <div class="form-group">
             <label>Descrição *</label>
-            <textarea id="editDesc" required></textarea>
+            <textarea id="editDesc" required style="min-height: 70px;"></textarea>
           </div>
 
           <div class="form-group">
@@ -315,7 +288,7 @@
           <div id="adicionaisList" style="margin-bottom: 16px;"></div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
-            <input type="text" id="novoAdicionalNome" placeholder="Nome do adicional" style="padding: 10px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text);">
+            <input type="text" id="novoAdicionalNome" placeholder="Nome" style="padding: 10px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text);">
             <input type="number" id="novoAdicionalPreco" placeholder="Preço" step="0.01" min="0" style="padding: 10px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text);">
           </div>
           <button type="button" class="btn" onclick="addAdicional()" style="width: 100%; margin-bottom: 20px;">➕ Adicionar Opcional</button>
@@ -329,10 +302,52 @@
     </div>
   </div>
 
+  <!-- MODAL CHECKOUT -->
+  <div id="checkoutModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛍️ Finalizar Pedido</h2>
+        <button class="close-btn" onclick="closeCheckout()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="checkoutAlert"></div>
+        <form id="checkoutForm" onsubmit="finalizarPedido(event)">
+          <div class="form-group">
+            <label>👤 Nome *</label>
+            <input type="text" id="clientName" required placeholder="Seu nome">
+          </div>
+
+          <div class="form-group">
+            <label>📱 WhatsApp *</label>
+            <input type="tel" id="clientPhone" required placeholder="(11) 99999-9999">
+          </div>
+
+          <div class="form-group">
+            <label>📍 Endereço *</label>
+            <input type="text" id="clientAddress" required placeholder="Rua, número">
+          </div>
+
+          <div class="form-group">
+            <label>🏘️ Bairro *</label>
+            <input type="text" id="clientNeighborhood" required placeholder="Bairro">
+          </div>
+
+          <div class="form-group">
+            <label>📝 Observação (opcional)</label>
+            <textarea id="clientObservation" style="min-height: 60px;" placeholder="Alguma observação?"></textarea>
+          </div>
+
+          <button type="submit" class="btn-checkout" style="width: 100%;">✓ Confirmar Pedido - R$ <span id="checkoutTotal">0,00</span></button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ===== CONFIGURAÇÃO =====
-    const ADMIN_PASSWORD = "1234"; // MUDE PARA SENHA FORTE!
+    const ADMIN_PASSWORD = "1234";
     const SHEETS_URL = "https://docs.google.com/spreadsheets/d/1mepco27k4xrhePSJg0EizfWxLDjKV54Rv9-XH9RA1VU/gviz/tq?tqx=out:csv&sheet=Produtos";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyONIg_wyusZra3YBPYl9Ywk-CBRGlBKIAoOjecWNWuKjfJ3qf_HoVaF6zeQJDQfdOEqQ/exec";
     
     let products = [];
     let cart = [];
@@ -342,6 +357,7 @@
     let editingProduct = null;
     let currentImage = null;
     let temporaryAdicionais = [];
+    let selectedAdicionais = {};
 
     // ===== AUTENTICAÇÃO =====
     function openLoginModal() {
@@ -362,7 +378,8 @@
         document.getElementById("loginBtn").classList.add("hidden");
         document.getElementById("logoutBtn").classList.remove("hidden");
         document.getElementById("editBtn").classList.remove("hidden");
-        showAlert("✅ Acesso de administrador concedido!", "loginAlert");
+        showAlert("✅ Acesso admin concedido!", "loginAlert");
+        renderMenu();
       } else {
         showAlert("❌ Senha incorreta", "loginAlert");
       }
@@ -396,18 +413,18 @@
           
           if (values.length >= 5 && values[0]) {
             try {
-              let preco = 0;
-              const precoStr = values[3];
-              
-              if (precoStr) {
-                preco = parseFloat(precoStr.replace('R$', '').replace(',', '.').trim());
-              }
+              let preco = parseFloat(values[3]?.replace('R$', '').replace(',', '.').trim()) || 0;
               
               if (!preco || isNaN(preco)) {
-                const numbers = precoStr.match(/(\d+[.,]\d+|\d+)/g);
-                if (numbers && numbers.length > 0) {
-                  preco = parseFloat(numbers[numbers.length - 1].replace(',', '.'));
-                }
+                const numbers = values[3]?.match(/(\d+[.,]\d+|\d+)/g);
+                if (numbers) preco = parseFloat(numbers[numbers.length - 1].replace(',', '.'));
+              }
+
+              let adicionais = [];
+              try {
+                adicionais = JSON.parse(values[6] || '[]');
+              } catch(e) {
+                adicionais = [];
               }
               
               products.push({
@@ -417,32 +434,32 @@
                 preco: preco || 0,
                 categoria: values[4] || "",
                 foto: values[5] || "",
-                adicionais: [] // Array para armazenar adicionais
+                adicionais: adicionais
               });
             } catch (e) {
-              console.error("Erro na linha", i, ":", e);
+              console.error("Erro na linha", i);
             }
           }
         }
         
         renderMenu();
       } catch (error) {
-        console.error("Erro ao carregar CSV:", error);
-        document.getElementById("menuSection").innerHTML = '<p style="grid-column: 1/-1; color: #ff6b6b; text-align: center; padding: 40px;">❌ Erro ao carregar produtos.</p>';
+        console.error("Erro:", error);
+        document.getElementById("menuSection").innerHTML = '<p style="grid-column: 1/-1; color: #ff6b6b; text-align: center; padding: 40px;">❌ Erro ao carregar produtos</p>';
       }
     }
 
     function renderMenu() {
       const section = document.getElementById("menuSection");
       if (!products || products.length === 0) {
-        section.innerHTML = '<p style="grid-column: 1/-1; color: var(--secondary); text-align: center; padding: 40px;">Nenhum produto cadastrado</p>';
+        section.innerHTML = '<p style="grid-column: 1/-1; color: var(--secondary); text-align: center; padding: 40px;">Nenhum produto</p>';
         return;
       }
       
       section.innerHTML = products.map(p => `
         <div class="product-card ${isAdmin ? 'edit-mode' : ''}">
           ${isAdmin ? `<div class="product-actions"><button class="btn-edit-product" onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">✏️ Editar</button></div>` : ''}
-          <img src="${p.foto || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22180%22%3E%3Cdefs%3E%3ClinearGradient id=%22grad%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22%3E%3Cstop offset=%220%25%22 style=%22stop-color:%23FF6600;stop-opacity:1%22 /%3E%3Cstop offset=%22100%25%22 style=%22stop-color:%23ff8c42;stop-opacity:1%22 /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%22300%22 height=%22180%22 fill=%22url(%23grad)%22/%3E%3C/svg%3E'}" class="product-img" alt="${p.nome}">
+          <img src="${p.foto || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22180%22%3E%3Crect width=%22300%22 height=%22180%22 fill=%22%23FF6600%22/%3E%3C/svg%3E'}" class="product-img" alt="${p.nome}">
           <div onclick="${isAdmin ? '' : `openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})`}" style="cursor: ${isAdmin ? 'default' : 'pointer'};">
             <div class="product-info">
               <div class="product-name">${p.nome}</div>
@@ -465,15 +482,44 @@
       if (isAdmin) return;
       currentProduct = product;
       currentQty = 1;
+      selectedAdicionais = {};
+      
       document.getElementById("modalName").textContent = product.nome;
       document.getElementById("modalDesc").textContent = product.descricao;
       document.getElementById("qtyDisplay").textContent = "1";
+      
+      const adicionaisSection = document.getElementById("adicionaisSection");
+      const adicionaisOptions = document.getElementById("adicionaisOptions");
+      
+      if (product.adicionais && product.adicionais.length > 0) {
+        adicionaisSection.style.display = "block";
+        adicionaisOptions.innerHTML = product.adicionais.map(a => `
+          <label class="option-label">
+            <input type="checkbox" value="${a.nome}" data-price="${a.preco}" onchange="updateAdicionais()">
+            <span class="option-text">
+              <span class="option-name">${a.nome}</span>
+              <span class="option-price">+R$ ${a.preco.toFixed(2)}</span>
+            </span>
+          </label>
+        `).join("");
+      } else {
+        adicionaisSection.style.display = "none";
+      }
+      
       updateModalPrice();
       document.getElementById("productModal").classList.add("active");
     }
 
     function closeModal() {
       document.getElementById("productModal").classList.remove("active");
+    }
+
+    function updateAdicionais() {
+      selectedAdicionais = {};
+      document.querySelectorAll('#adicionaisOptions input[type="checkbox"]:checked').forEach(checkbox => {
+        selectedAdicionais[checkbox.value] = parseFloat(checkbox.dataset.price);
+      });
+      updateModalPrice();
     }
 
     function openEditModal(product) {
@@ -521,7 +567,7 @@
       const preco = parseFloat(document.getElementById("novoAdicionalPreco").value) || 0;
 
       if (!nome) {
-        showAlert("❌ Preencha o nome do adicional", "editAlert");
+        showAlert("❌ Preencha o nome", "editAlert");
         return;
       }
 
@@ -545,11 +591,11 @@
 
       lista.innerHTML = temporaryAdicionais.map((a, i) => `
         <div class="adicional-item">
-          <div class="adicional-info">
-            <div class="adicional-name">${a.nome}</div>
-            <div class="adicional-price">+R$ ${a.preco.toFixed(2)}</div>
+          <div>
+            <div style="color: var(--text); font-weight: bold;">${a.nome}</div>
+            <div style="color: var(--secondary); font-size: 0.9em;">+R$ ${a.preco.toFixed(2)}</div>
           </div>
-          <button type="button" class="btn-remove-adicional" onclick="removeAdicional(${i})">✕</button>
+          <button type="button" style="background: #d32f2f; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8em;" onclick="removeAdicional(${i})">✕</button>
         </div>
       `).join("");
     }
@@ -571,20 +617,95 @@
       if (index !== -1) {
         products[index] = {
           ...products[index],
-          nome: nome,
-          descricao: descricao,
-          preco: preco,
-          categoria: categoria,
+          nome, descricao, preco, categoria,
           foto: currentImage || products[index].foto,
           adicionais: temporaryAdicionais
         };
         
-        showAlert("✅ Produto salvo com sucesso!", "editAlert");
+        // Salvar no Apps Script
+        try {
+          await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            payload: JSON.stringify({
+              action: "atualizarProduto",
+              id: editingProduct.id,
+              nome, descricao, preco, categoria,
+              foto: currentImage || products[index].foto,
+              adicionais: temporaryAdicionais
+            })
+          });
+        } catch(e) {
+          console.error("Erro ao salvar:", e);
+        }
         
+        showAlert("✅ Produto salvo!", "editAlert");
         setTimeout(() => {
           closeEditModal();
           renderMenu();
         }, 1500);
+      }
+    }
+
+    function openCheckout() {
+      if (cart.length === 0) {
+        alert("❌ Carrinho vazio!");
+        return;
+      }
+      document.getElementById("checkoutTotal").textContent = calculateTotal().toFixed(2);
+      document.getElementById("checkoutModal").classList.add("active");
+    }
+
+    function closeCheckout() {
+      document.getElementById("checkoutModal").classList.remove("active");
+    }
+
+    async function finalizarPedido(event) {
+      event.preventDefault();
+
+      const nome = document.getElementById("clientName").value.trim();
+      const telefone = document.getElementById("clientPhone").value.trim();
+      const endereco = document.getElementById("clientAddress").value.trim();
+      const bairro = document.getElementById("clientNeighborhood").value.trim();
+      const obs = document.getElementById("clientObservation").value.trim();
+
+      if (!nome || !telefone || !endereco || !bairro) {
+        showAlert("❌ Preencha todos os campos", "checkoutAlert");
+        return;
+      }
+
+      const total = calculateTotal();
+      const enderecoCompleto = `${endereco}, ${bairro}`;
+
+      try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          payload: JSON.stringify({
+            action: "criarPedido",
+            cliente: nome,
+            telefone: telefone,
+            endereco: enderecoCompleto,
+            itens: cart,
+            valorTotal: total,
+            observacoes: obs
+          })
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.sucesso) {
+          showAlert("✅ Pedido criado com sucesso!", "checkoutAlert");
+          alert(`Pedido confirmado!\nID: ${resultado.pedidoID}\nValor: R$ ${total.toFixed(2)}\n\nVocê receberá atualizações por WhatsApp`);
+          
+          cart = [];
+          updateCart();
+          closeCheckout();
+          document.getElementById("checkoutForm").reset();
+        } else {
+          showAlert("❌ Erro: " + resultado.erro, "checkoutAlert");
+        }
+      } catch(error) {
+        console.error("Erro:", error);
+        showAlert("❌ Erro ao processar pedido", "checkoutAlert");
       }
     }
 
@@ -614,7 +735,8 @@
 
     function updateModalPrice() {
       if (!currentProduct) return;
-      const price = currentProduct.preco * currentQty;
+      let adicionalPrice = Object.values(selectedAdicionais).reduce((a, b) => a + b, 0);
+      const price = (currentProduct.preco + adicionalPrice) * currentQty;
       document.getElementById("modalPrice").textContent = price.toFixed(2);
     }
 
@@ -622,15 +744,18 @@
       if (!currentProduct) return;
       
       const existing = cart.find(item => item.id === currentProduct.id);
+      const adicionalPrice = Object.values(selectedAdicionais).reduce((a, b) => a + b, 0);
+      const itemPrice = currentProduct.preco + adicionalPrice;
+      
       if (existing) {
         existing.qty += currentQty;
       } else {
         cart.push({
           id: currentProduct.id,
           nome: currentProduct.nome,
-          preco: currentProduct.preco,
+          preco: itemPrice,
           qty: currentQty,
-          adicionais: currentProduct.adicionais || []
+          adicionaisSelecionados: selectedAdicionais
         });
       }
       
@@ -641,6 +766,11 @@
     function removeFromCart(id) {
       cart = cart.filter(item => item.id !== id);
       updateCart();
+    }
+
+    function calculateTotal() {
+      const subtotal = cart.reduce((sum, item) => sum + (item.preco * item.qty), 0);
+      return subtotal + 5.00;
     }
 
     function updateCart() {
@@ -659,20 +789,18 @@
         return `
           <div class="cart-item">
             <div style="flex: 1;">
-              <div class="cart-item-name">${item.nome}</div>
-              <div class="cart-item-qty">Qtd: ${item.qty}</div>
+              <div style="color: var(--text); font-weight: bold;">${item.nome}</div>
+              <div style="color: var(--secondary); font-size: 0.9em;">Qtd: ${item.qty}</div>
             </div>
             <div style="text-align: right; display: flex; gap: 8px; align-items: center;">
               <div style="color: #FFE4CC; font-weight: bold;">R$ ${total.toFixed(2)}</div>
-              <button class="remove-btn" onclick="removeFromCart('${item.id}')">✕</button>
+              <button style="background: #d32f2f; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 0.8em;" onclick="removeFromCart('${item.id}')">✕</button>
             </div>
           </div>
         `;
       }).join("");
       
-      const entrega = 5.00;
-      const totalFinal = subtotal + entrega;
-      
+      const totalFinal = calculateTotal();
       document.getElementById("subtotal").textContent = `R$ ${subtotal.toFixed(2)}`;
       document.getElementById("total").textContent = `R$ ${totalFinal.toFixed(2)}`;
     }
