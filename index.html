@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Haffe's Hamburgueria | Pedidos Online</title>
+  <title>Haffe's Hamburgueria | Cardápio Online</title>
   <style>
     * {
       margin: 0;
@@ -39,6 +39,14 @@
       position: sticky;
       top: 0;
       z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header .logo-section {
+      flex: 1;
+      text-align: center;
     }
 
     header h1 {
@@ -51,6 +59,21 @@
     header p {
       color: var(--light-text);
       font-size: 0.95em;
+    }
+
+    .admin-btn {
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .admin-btn:hover {
+      background: #ff5500;
     }
 
     /* ===== CONTAINER ===== */
@@ -66,6 +89,12 @@
     @media (max-width: 1024px) {
       .wrapper {
         grid-template-columns: 1fr;
+      }
+      header {
+        flex-direction: column;
+      }
+      .admin-btn {
+        margin-top: 10px;
       }
     }
 
@@ -96,7 +125,7 @@
       width: 100%;
       height: 180px;
       object-fit: cover;
-      background: linear-gradient(135deg, #333, #222);
+      background: linear-gradient(135deg, #FF6600, #ff8c42);
     }
 
     .product-info {
@@ -215,6 +244,10 @@
       font-size: 0.8em;
     }
 
+    .btn-remove:hover {
+      background: #b71c1c;
+    }
+
     .cart-summary {
       border-top: 1px solid var(--border);
       padding-top: 15px;
@@ -225,6 +258,7 @@
       justify-content: space-between;
       margin-bottom: 8px;
       color: var(--secondary-text);
+      font-size: 0.95em;
     }
 
     .summary-row.total {
@@ -407,6 +441,10 @@
       font-size: 1.1em;
     }
 
+    .qty-btn:hover {
+      background: #ff5500;
+    }
+
     .qty-display {
       font-size: 1.3em;
       font-weight: bold;
@@ -436,6 +474,10 @@
     .btn-cancel {
       background: #555;
       color: white;
+    }
+
+    .btn-cancel:hover {
+      background: #666;
     }
 
     .btn-confirm {
@@ -476,6 +518,13 @@
       border-radius: 4px;
       color: var(--text);
       font-size: 1em;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #ff5500;
+      background: rgba(255, 102, 0, 0.2);
     }
 
     .form-row {
@@ -519,6 +568,7 @@
       padding: 12px;
       border-radius: 6px;
       margin-bottom: 15px;
+      animation: slideIn 0.3s ease;
     }
 
     .alert.error {
@@ -531,6 +581,11 @@
       background: rgba(76, 175, 80, 0.2);
       border: 1px solid #4caf50;
       color: #90ee90;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     .loading {
@@ -557,6 +612,141 @@
       display: block;
     }
 
+    /* ===== ADMIN PANEL ===== */
+    .admin-panel {
+      display: none;
+      max-width: 900px;
+      margin: 30px auto;
+      background: rgba(30, 30, 30, 0.9);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 30px;
+    }
+
+    .admin-panel.active {
+      display: block;
+    }
+
+    .admin-title {
+      color: var(--primary);
+      font-size: 1.8em;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .admin-tab {
+      background: rgba(255, 102, 0, 0.1);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 20px;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: bold;
+    }
+
+    .admin-tab:hover {
+      background: rgba(255, 102, 0, 0.2);
+    }
+
+    .admin-tab.active {
+      background: var(--primary);
+      color: #000;
+    }
+
+    .admin-content {
+      display: none;
+    }
+
+    .admin-content.active {
+      display: block;
+    }
+
+    .form-section {
+      background: rgba(255, 102, 0, 0.05);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .form-section h3 {
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    .product-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .product-item {
+      background: rgba(255, 102, 0, 0.1);
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border-left: 4px solid var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .product-item-info {
+      flex: 1;
+    }
+
+    .product-item-name {
+      color: var(--light-text);
+      font-weight: bold;
+      font-size: 1.05em;
+    }
+
+    .product-item-price {
+      color: var(--secondary-text);
+      font-size: 0.9em;
+      margin-top: 3px;
+    }
+
+    .product-item-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-edit, .btn-delete {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9em;
+      transition: all 0.2s;
+    }
+
+    .btn-edit {
+      background: #2196F3;
+      color: white;
+    }
+
+    .btn-edit:hover {
+      background: #1976D2;
+    }
+
+    .btn-delete {
+      background: #d32f2f;
+      color: white;
+    }
+
+    .btn-delete:hover {
+      background: #b71c1c;
+    }
+
     @media (max-width: 768px) {
       .wrapper {
         grid-template-columns: 1fr;
@@ -577,16 +767,100 @@
       .form-row {
         grid-template-columns: 1fr;
       }
+
+      .admin-tabs {
+        flex-wrap: wrap;
+      }
+
+      .product-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .product-item-actions {
+        margin-top: 10px;
+        width: 100%;
+        justify-content: space-between;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>🍔 Haffe's Hamburgueria</h1>
-    <p>Cardápio Online | Entrega Rápida</p>
+    <div class="logo-section">
+      <h1>🍔 Haffe's Hamburgueria</h1>
+      <p>Cardápio Online | Entrega Rápida</p>
+    </div>
+    <button class="admin-btn" onclick="toggleAdmin()">⚙️ Admin</button>
   </header>
 
-  <div class="wrapper">
+  <!-- ADMIN PANEL -->
+  <div class="admin-panel" id="adminPanel">
+    <h1 class="admin-title">Painel Administrativo</h1>
+    
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchAdminTab('add')">➕ Adicionar Produto</button>
+      <button class="admin-tab" onclick="switchAdminTab('list')">📋 Listar Produtos</button>
+    </div>
+
+    <!-- ABA: ADICIONAR PRODUTO -->
+    <div class="admin-content active" id="addTab">
+      <div class="form-section">
+        <h3>Novo Produto</h3>
+        <form id="productForm">
+          <div class="form-group">
+            <label>Nome do Produto *</label>
+            <input type="text" id="prodNome" required placeholder="Ex: Cheddar Bacon Artesanal">
+          </div>
+
+          <div class="form-group">
+            <label>Descrição *</label>
+            <textarea id="prodDesc" required placeholder="Ex: Burger 160g, cheddar, bacon artesanal..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Preço (R$) *</label>
+              <input type="number" id="prodPreco" step="0.01" required placeholder="28.90">
+            </div>
+            <div class="form-group">
+              <label>Categoria *</label>
+              <select id="prodCat" required>
+                <option value="">Selecione...</option>
+                <option value="Hamburger">Hambúrguer</option>
+                <option value="Acompanhamento">Acompanhamento</option>
+                <option value="Bebida">Bebida</option>
+                <option value="Sobremesa">Sobremesa</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>URL da Foto (opcional)</label>
+            <input type="url" id="prodFoto" placeholder="https://...">
+          </div>
+
+          <button type="submit" class="btn-checkout">✓ Cadastrar Produto</button>
+          <div id="formAlert"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ABA: LISTAR PRODUTOS -->
+    <div class="admin-content" id="listTab">
+      <div class="form-section">
+        <h3>Produtos Cadastrados</h3>
+        <div class="product-list" id="productList">
+          <p style="text-align: center; color: var(--secondary-text);">Carregando...</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-checkout" style="background: #555;" onclick="toggleAdmin()">✕ Fechar Painel</button>
+  </div>
+
+  <!-- SITE DE CARDÁPIO -->
+  <div class="wrapper" id="cardapioWrapper" style="display: grid;">
     <!-- MENU -->
     <div class="menu-section" id="menuSection">
       <!-- Produtos carregam aqui via JavaScript -->
@@ -746,8 +1020,8 @@
   </div>
 
   <script>
-    // ===== CONFIGURAÇÕES =====
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3mhbI6K7QfuyDOBZmQ7sXUQosHcR4VRCZeULK4av0eXLs923kyE6Ba52kKSPxxCrjZw/exec"; // Cole sua URL do Apps Script
+    // ===== CONFIGURAÇÃO GERAL =====
+    const APPS_SCRIPT_URL = "COLE_SUA_URL_DO_APPS_SCRIPT_AQUI";
     
     let products = [];
     let cart = [];
@@ -757,6 +1031,31 @@
     let currentObservations = "";
     let couponDiscount = 0;
     const DELIVERY_FEE = 5.00;
+    let adminMode = false;
+
+    // ===== FUNÇÃO: TOGGLE ADMIN =====
+    function toggleAdmin() {
+      adminMode = !adminMode;
+      const adminPanel = document.getElementById('adminPanel');
+      const cardapioWrapper = document.getElementById('cardapioWrapper');
+      
+      if (adminMode) {
+        adminPanel.classList.add('active');
+        cardapioWrapper.style.display = 'none';
+        loadProductsList();
+      } else {
+        adminPanel.classList.remove('active');
+        cardapioWrapper.style.display = 'grid';
+      }
+    }
+
+    function switchAdminTab(tab) {
+      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.admin-content').forEach(c => c.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(tab === 'add' ? 'addTab' : 'listTab').classList.add('active');
+    }
 
     // ===== CARREGA PRODUTOS =====
     async function loadProducts() {
@@ -771,9 +1070,14 @@
 
     function renderMenu() {
       const menuSection = document.getElementById("menuSection");
+      if (products.length === 0) {
+        menuSection.innerHTML = "<p style='color: var(--secondary-text);'>Nenhum produto cadastrado</p>";
+        return;
+      }
+      
       menuSection.innerHTML = products.map(product => `
         <div class="product-card" onclick="openProductModal(${JSON.stringify(product).replace(/"/g, '&quot;')})">
-          <div class="product-img" style="background: linear-gradient(135deg, #FF6600, #ff8c42);"></div>
+          <img class="product-img" src="${product.foto || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22280%22 height=%22180%22%3E%3Crect fill=%22%23FF6600%22 width=%22280%22 height=%22180%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2224%22%3E${product.nome}%3C/text%3E%3C/svg%3E'}" alt="${product.nome}">
           <div class="product-info">
             <div class="product-name">${product.nome}</div>
             <div class="product-desc">${product.descricao}</div>
@@ -797,7 +1101,7 @@
       document.getElementById("observations").value = "";
       document.getElementById("qtyDisplay").textContent = "1";
 
-      // Render ponto da carne (apenas para produtos com carne)
+      // Render ponto da carne
       const meatSection = document.getElementById("meatPointSection");
       const meatOptions = document.getElementById("meatPointOptions");
       meatOptions.innerHTML = "";
@@ -845,7 +1149,7 @@
         { id: "mayo_artesanal", name: "Maionese Artesanal", price: 5.00 },
         { id: "ketchup", name: "Ketchup", price: 0 },
         { id: "mostarda", name: "Mostarda", price: 0 },
-        { id: "guarnapa", name: "Guardanapo Extra", price: 0 }
+        { id: "guardanapo", name: "Guardanapo Extra", price: 0 }
       ];
       saucesOptions.innerHTML = sauces.map(sauce => `
         <label class="option-label">
@@ -914,7 +1218,7 @@
       cart.push(cartItem);
       updateCart();
       closeProductModal();
-      showAlert("✅ Produto adicionado ao carrinho!", "cart-items");
+      showAlert("✅ Produto adicionado ao carrinho!", "modalAlert");
     }
 
     function removeFromCart(itemId) {
@@ -957,13 +1261,18 @@
     }
 
     function applyCoupon() {
-      const couponCode = document.getElementById("couponInput").value;
+      const couponCode = document.getElementById("couponInput").value.toUpperCase();
       if (couponCode === "HAFFE10") {
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         couponDiscount = subtotal * 0.10;
-        showAlert("✅ Cupom aplicado com 10% de desconto!", "cart-items");
+        showAlert("✅ Cupom aplicado com 10% de desconto!", "checkoutAlert");
+      } else if (couponCode === "HAFFE20") {
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        couponDiscount = subtotal * 0.20;
+        showAlert("✅ Cupom aplicado com 20% de desconto!", "checkoutAlert");
       } else if (couponCode) {
-        showAlert("❌ Cupom inválido", "cart-items");
+        showAlert("❌ Cupom inválido", "checkoutAlert");
+        couponDiscount = 0;
       }
       updateTotals();
     }
@@ -1049,6 +1358,109 @@
         this.closest(".payment-option").classList.add("selected");
       });
     });
+
+    // ===== ADMIN: ADICIONAR PRODUTO =====
+    document.getElementById("productForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const nome = document.getElementById("prodNome").value;
+      const descricao = document.getElementById("prodDesc").value;
+      const preco = parseFloat(document.getElementById("prodPreco").value);
+      const categoria = document.getElementById("prodCat").value;
+      const foto = document.getElementById("prodFoto").value;
+
+      const formAlert = document.getElementById("formAlert");
+
+      try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          payload: JSON.stringify({
+            action: "novoProduto",
+            nome: nome,
+            descricao: descricao,
+            preco: preco,
+            categoria: categoria,
+            foto: foto
+          })
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.sucesso) {
+          formAlert.innerHTML = '<div class="alert success">✅ Produto cadastrado com sucesso!</div>';
+          this.reset();
+          loadProducts();
+          loadProductsList();
+          setTimeout(() => formAlert.innerHTML = "", 3000);
+        } else {
+          formAlert.innerHTML = `<div class="alert error">❌ ${resultado.erro}</div>`;
+        }
+      } catch (error) {
+        console.error("Erro:", error);
+        formAlert.innerHTML = '<div class="alert error">❌ Erro ao cadastrar produto</div>';
+      }
+    });
+
+    // ===== ADMIN: LISTAR PRODUTOS =====
+    async function loadProductsList() {
+      try {
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=getProdutos`);
+        const prods = await response.json();
+
+        const productList = document.getElementById("productList");
+        if (prods.length === 0) {
+          productList.innerHTML = "<p style='text-align: center; color: var(--secondary-text);'>Nenhum produto cadastrado</p>";
+          return;
+        }
+
+        productList.innerHTML = prods.map(prod => `
+          <div class="product-item">
+            <div class="product-item-info">
+              <div class="product-item-name">${prod.nome}</div>
+              <div class="product-item-price">R$ ${prod.preco.toFixed(2)} - ${prod.categoria}</div>
+            </div>
+            <div class="product-item-actions">
+              <button class="btn-edit" onclick="editProduct('${prod.id}')">Editar</button>
+              <button class="btn-delete" onclick="deleteProduct('${prod.id}')">Excluir</button>
+            </div>
+          </div>
+        `).join("");
+      } catch (error) {
+        console.error("Erro ao listar produtos:", error);
+      }
+    }
+
+    // ===== ADMIN: DELETAR PRODUTO =====
+    async function deleteProduct(productId) {
+      if (!confirm("Tem certeza que deseja deletar este produto?")) return;
+
+      try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          payload: JSON.stringify({
+            action: "deletarProduto",
+            productId: productId
+          })
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.sucesso) {
+          alert("Produto deletado com sucesso!");
+          loadProducts();
+          loadProductsList();
+        } else {
+          alert(`Erro: ${resultado.erro}`);
+        }
+      } catch (error) {
+        console.error("Erro:", error);
+        alert("Erro ao deletar produto");
+      }
+    }
+
+    function editProduct(productId) {
+      alert("Função de edição será implementada em breve!");
+    }
 
     function showAlert(message, elementId) {
       const alertDiv = document.getElementById(elementId) || document.getElementById("checkoutAlert");
