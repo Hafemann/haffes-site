@@ -1409,7 +1409,7 @@
 
   <script>
     // ===== CONFIGURAÇÃO =====
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzSqcL2VugYKEg1mp1zuJ6V48-MPFudjACjDx_ucapmlODHyLxJvMIyvmy3sBwlMsfJgw/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaJXWpd_n4JLIlhWvLEj8pQ2hIWg3jwIqGIkTgGaMMqkmXPiGsetjtMOVD-IoFrV5Y/exec";
     const STRIPE_PUBLIC_KEY = "pk_test_51SPnzVGZ9m2QWLCwXuMRC58zYv4wOVx1UTqc0Crp87YSbHmxFOBCvoU4ZQWaCY8MXtQRsFEGIOavZADYcBSrM0Cb00aLSWrU89";
     const PIX_KEY = "05455571192";
     const NOME_LOJA = "Haffe's Hamburgueria";
@@ -1509,21 +1509,43 @@
     }
 
     // ===== CARREGA PRODUTOS (COM WORKAROUND CORS) =====
+// ===== CONFIGURAÇÃO =====
+const SHEETS_ID = "1mepco27k4xrhePSJg0EizfWxLDjKV54Rv9-XH9RA1VU"; // ID da planilha
+const SHEET_NAME = "Produtos"; // Nome da aba
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaJXWpd_n4JLIlhWvLEj8pQ2hIWg3jwIqGIkTgGaMMqkmXPiGsetjtMOVD-IoFrV5Y/exec"; // Para pedidos
+
+// ===== CARREGA PRODUTOS VIA SHEETS API =====
 async function loadProducts() {
   try {
-    const response = await fetch(`${APPS_SCRIPT_URL}?action=getProdutos`, {
-      method: 'GET',
-      mode: 'no-cors'
-    });
+    // Usar Sheets API diretamente
+    const url = `https://docs.google.com/spreadsheets/d/1mepco27k4xrhePSJg0EizfWxLDjKV54Rv9-XH9RA1VU/edit?usp=sharing`;
     
-    // Com no-cors, precisamos fazer de outro jeito
-    // Vamos usar JSONP como fallback
-    loadProductsViaJSONP();
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    products = [];
+    if (data.values) {
+      data.values.forEach(row => {
+        if (row[0]) { // Se tiver ID
+          products.push({
+            id: row[0],
+            nome: row[1] || "",
+            descricao: row[2] || "",
+            preco: parseFloat(row[3]) || 0,
+            categoria: row[4] || "",
+            foto: row[5] || ""
+          });
+        }
+      });
+    }
+    
+    renderMenu();
   } catch (error) {
-    console.error("Erro ao carregar produtos (tentando JSONP):", error);
-    loadProductsViaJSONP();
+    console.error("Erro ao carregar produtos:", error);
+    showAlert("❌ Erro ao carregar produtos", "modalAlert");
   }
 }
+
 
 function loadProductsViaJSONP() {
   try {
@@ -2178,6 +2200,7 @@ function loadProductsViaJSONP() {
   </script>
 </body>
 </html>
+
 
 
 
