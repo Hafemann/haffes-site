@@ -35,6 +35,7 @@
     .header-actions { display: flex; gap: 10px; }
     .btn { background: var(--primary); color: #000; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
     .btn:hover { background: #ff8533; transform: translateY(-2px); }
+    .btn.hidden { display: none; }
     .wrapper { display: grid; grid-template-columns: 1fr 380px; gap: 20px; padding: 30px 20px; max-width: 1500px; margin: 0 auto; }
     .menu-section { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
     .product-card {
@@ -48,7 +49,7 @@
     }
     .product-card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255, 102, 0, 0.2); }
     .product-card.edit-mode { border-color: var(--primary); box-shadow: 0 0 20px rgba(255, 102, 0, 0.3); }
-    .product-img { width: 100%; height: 180px; background: linear-gradient(135deg, var(--primary), #ff8533); }
+    .product-img { width: 100%; height: 180px; background: linear-gradient(135deg, var(--primary), #ff8533); object-fit: cover; }
     .product-info { padding: 16px; }
     .product-name { color: var(--primary); font-size: 1.1em; font-weight: bold; margin-bottom: 4px; }
     .product-desc { color: var(--secondary); font-size: 0.85em; margin-bottom: 10px; line-height: 1.4; }
@@ -115,7 +116,7 @@
     .remove-btn { background: #d32f2f; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 0.8em; transition: 0.2s; }
     .remove-btn:hover { background: #f44336; }
     
-    /* Edit Modal Styles */
+    /* Form Styles */
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; color: var(--primary); font-weight: bold; margin-bottom: 6px; font-size: 0.9em; }
     .form-group input, .form-group textarea, .form-group select {
@@ -135,9 +136,41 @@
       box-shadow: 0 0 10px rgba(255, 102, 0, 0.15);
     }
     .form-group textarea { min-height: 70px; resize: vertical; }
+    
+    /* Image Upload */
+    .image-preview { width: 100%; height: 150px; background: rgba(255, 102, 0, 0.1); border: 2px dashed rgba(255, 102, 0, 0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; }
+    .image-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .file-label { display: inline-block; background: var(--primary); color: #000; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+    .file-label:hover { background: #ff8533; }
+    .file-label input { display: none; }
+    
+    /* Adicionais List */
+    .adicional-item {
+      background: rgba(255, 102, 0, 0.08);
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 102, 0, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .adicional-info { flex: 1; }
+    .adicional-name { color: var(--text); font-weight: bold; }
+    .adicional-price { color: var(--secondary); font-size: 0.9em; }
+    .btn-remove-adicional { background: #d32f2f; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
+    
+    /* Alert */
     .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid; }
     .alert.success { background: rgba(76, 175, 80, 0.15); border-left-color: #4caf50; color: #90ee90; }
     .alert.error { background: rgba(211, 47, 47, 0.15); border-left-color: #d32f2f; color: #ff6b6b; }
+    
+    /* Login Modal */
+    .login-container { text-align: center; }
+    .login-container h2 { margin-bottom: 20px; color: var(--primary); }
+    .login-input { width: 100%; padding: 12px; margin-bottom: 16px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text); }
+    .login-btn { width: 100%; padding: 12px; background: var(--primary); color: #000; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .login-btn:hover { background: #ff8533; }
     
     @media (max-width: 1024px) {
       .wrapper { grid-template-columns: 1fr; }
@@ -153,7 +186,9 @@
       <p>Cardápio Online</p>
     </div>
     <div class="header-actions">
-      <button class="btn" onclick="toggleEditMode()">✏️ Editar</button>
+      <button class="btn hidden" id="editBtn" onclick="toggleEditMode()">✏️ Editar</button>
+      <button class="btn hidden" id="logoutBtn" onclick="logout()">🚪 Sair</button>
+      <button class="btn" id="loginBtn" onclick="openLoginModal()">🔐 Admin</button>
       <button class="btn" onclick="location.reload()">🔄 Atualizar</button>
     </div>
   </header>
@@ -186,7 +221,7 @@
     </div>
   </div>
 
-  <!-- MODAL PRODUTO -->
+  <!-- MODAL PRODUTO (compra) -->
   <div id="productModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -212,9 +247,26 @@
     </div>
   </div>
 
+  <!-- MODAL LOGIN -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2>🔐 Acesso Admin</h2>
+        <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="login-container">
+          <input type="password" id="passwordInput" class="login-input" placeholder="Digite a senha" onkeypress="if(event.key==='Enter') authenticate()">
+          <button class="login-btn" onclick="authenticate()">Entrar</button>
+          <div id="loginAlert"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL EDITAR PRODUTO -->
   <div id="editModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 600px;">
       <div class="modal-header">
         <h2>✏️ Editar Produto</h2>
         <button class="close-btn" onclick="closeEditModal()">&times;</button>
@@ -223,6 +275,17 @@
         <div id="editAlert"></div>
         
         <form id="editForm" onsubmit="saveProduct(event)">
+          <div class="form-group">
+            <label>📷 Imagem do Produto</label>
+            <div class="image-preview" id="imagePreview">
+              <span style="color: var(--secondary);">Nenhuma imagem</span>
+            </div>
+            <label class="file-label">
+              📁 Escolher Imagem
+              <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload()">
+            </label>
+          </div>
+
           <div class="form-group">
             <label>Nome do Produto *</label>
             <input type="text" id="editNome" required>
@@ -248,7 +311,16 @@
             </select>
           </div>
 
-          <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <div class="section-title">➕ Adicionais</div>
+          <div id="adicionaisList" style="margin-bottom: 16px;"></div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+            <input type="text" id="novoAdicionalNome" placeholder="Nome do adicional" style="padding: 10px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text);">
+            <input type="number" id="novoAdicionalPreco" placeholder="Preço" step="0.01" min="0" style="padding: 10px; background: rgba(255, 102, 0, 0.08); border: 1px solid rgba(255, 102, 0, 0.2); border-radius: 6px; color: var(--text);">
+          </div>
+          <button type="button" class="btn" onclick="addAdicional()" style="width: 100%; margin-bottom: 20px;">➕ Adicionar Opcional</button>
+
+          <div style="display: flex; gap: 10px;">
             <button type="button" class="btn-cancel" onclick="closeEditModal()" style="flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Cancelar</button>
             <button type="submit" class="btn-confirm" style="flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Salvar</button>
           </div>
@@ -258,19 +330,55 @@
   </div>
 
   <script>
+    // ===== CONFIGURAÇÃO =====
+    const ADMIN_PASSWORD = "1234"; // MUDE PARA SENHA FORTE!
+    const SHEETS_URL = "https://docs.google.com/spreadsheets/d/1mepco27k4xrhePSJg0EizfWxLDjKV54Rv9-XH9RA1VU/gviz/tq?tqx=out:csv&sheet=Produtos";
+    
     let products = [];
     let cart = [];
     let currentProduct = null;
     let currentQty = 1;
-    let editMode = false;
+    let isAdmin = false;
     let editingProduct = null;
+    let currentImage = null;
+    let temporaryAdicionais = [];
 
-    // ===== CARREGA PRODUTOS VIA CSV =====
+    // ===== AUTENTICAÇÃO =====
+    function openLoginModal() {
+      document.getElementById("passwordInput").value = '';
+      document.getElementById("loginAlert").innerHTML = '';
+      document.getElementById("loginModal").classList.add("active");
+    }
+
+    function closeLoginModal() {
+      document.getElementById("loginModal").classList.remove("active");
+    }
+
+    function authenticate() {
+      const password = document.getElementById("passwordInput").value;
+      if (password === ADMIN_PASSWORD) {
+        isAdmin = true;
+        closeLoginModal();
+        document.getElementById("loginBtn").classList.add("hidden");
+        document.getElementById("logoutBtn").classList.remove("hidden");
+        document.getElementById("editBtn").classList.remove("hidden");
+        showAlert("✅ Acesso de administrador concedido!", "loginAlert");
+      } else {
+        showAlert("❌ Senha incorreta", "loginAlert");
+      }
+    }
+
+    function logout() {
+      isAdmin = false;
+      document.getElementById("loginBtn").classList.remove("hidden");
+      document.getElementById("logoutBtn").classList.add("hidden");
+      document.getElementById("editBtn").classList.add("hidden");
+      renderMenu();
+    }
+
+    // ===== CARREGA PRODUTOS =====
     async function loadProducts() {
       try {
-        // URL CSV - SUBSTITUA O ID_DA_PLANILHA AQUI
-        const SHEETS_URL = "https://docs.google.com/spreadsheets/d/1mepco27k4xrhePSJg0EizfWxLDjKV54Rv9-XH9RA1VU/gviz/tq?tqx=out:csv&sheet=Produtos";
-        
         const response = await fetch(SHEETS_URL);
         if (!response.ok) throw new Error("Erro ao carregar planilha");
         
@@ -292,12 +400,7 @@
               const precoStr = values[3];
               
               if (precoStr) {
-                preco = parseFloat(
-                  precoStr
-                    .replace('R$', '')
-                    .replace(',', '.')
-                    .trim()
-                );
+                preco = parseFloat(precoStr.replace('R$', '').replace(',', '.').trim());
               }
               
               if (!preco || isNaN(preco)) {
@@ -313,7 +416,8 @@
                 descricao: values[2] || "",
                 preco: preco || 0,
                 categoria: values[4] || "",
-                foto: values[5] || ""
+                foto: values[5] || "",
+                adicionais: [] // Array para armazenar adicionais
               });
             } catch (e) {
               console.error("Erro na linha", i, ":", e);
@@ -324,7 +428,7 @@
         renderMenu();
       } catch (error) {
         console.error("Erro ao carregar CSV:", error);
-        document.getElementById("menuSection").innerHTML = '<p style="grid-column: 1/-1; color: #ff6b6b; text-align: center; padding: 40px;">❌ Erro ao carregar produtos.<br>Verifique se o ID da planilha está correto no código.</p>';
+        document.getElementById("menuSection").innerHTML = '<p style="grid-column: 1/-1; color: #ff6b6b; text-align: center; padding: 40px;">❌ Erro ao carregar produtos.</p>';
       }
     }
 
@@ -336,16 +440,16 @@
       }
       
       section.innerHTML = products.map(p => `
-        <div class="product-card ${editMode ? 'edit-mode' : ''}">
-          ${editMode ? `<div class="product-actions"><button class="btn-edit-product" onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">✏️ Editar</button></div>` : ''}
-          <div onclick="${editMode ? '' : `openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})`}" style="cursor: ${editMode ? 'default' : 'pointer'};">
-            <div class="product-img"></div>
+        <div class="product-card ${isAdmin ? 'edit-mode' : ''}">
+          ${isAdmin ? `<div class="product-actions"><button class="btn-edit-product" onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">✏️ Editar</button></div>` : ''}
+          <img src="${p.foto || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22180%22%3E%3Cdefs%3E%3ClinearGradient id=%22grad%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22%3E%3Cstop offset=%220%25%22 style=%22stop-color:%23FF6600;stop-opacity:1%22 /%3E%3Cstop offset=%22100%25%22 style=%22stop-color:%23ff8c42;stop-opacity:1%22 /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%22300%22 height=%22180%22 fill=%22url(%23grad)%22/%3E%3C/svg%3E'}" class="product-img" alt="${p.nome}">
+          <div onclick="${isAdmin ? '' : `openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})`}" style="cursor: ${isAdmin ? 'default' : 'pointer'};">
             <div class="product-info">
               <div class="product-name">${p.nome}</div>
               <div class="product-desc">${p.descricao}</div>
               <div class="product-footer">
                 <span class="product-price">R$ ${p.preco.toFixed(2)}</span>
-                <button class="btn-add" ${editMode ? 'style="display:none"' : ''} onclick="event.stopPropagation(); openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">+</button>
+                <button class="btn-add" ${isAdmin ? 'style="display:none"' : ''} onclick="event.stopPropagation(); openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">+</button>
               </div>
             </div>
           </div>
@@ -354,12 +458,11 @@
     }
 
     function toggleEditMode() {
-      editMode = !editMode;
       renderMenu();
     }
 
     function openModal(product) {
-      if (editMode) return;
+      if (isAdmin) return;
       currentProduct = product;
       currentQty = 1;
       document.getElementById("modalName").textContent = product.nome;
@@ -375,10 +478,20 @@
 
     function openEditModal(product) {
       editingProduct = product;
+      temporaryAdicionais = JSON.parse(JSON.stringify(product.adicionais || []));
+      currentImage = product.foto || null;
+      
       document.getElementById("editNome").value = product.nome;
       document.getElementById("editDesc").value = product.descricao;
       document.getElementById("editPreco").value = product.preco;
       document.getElementById("editCategoria").value = product.categoria;
+      
+      if (currentImage) {
+        const preview = document.getElementById("imagePreview");
+        preview.innerHTML = `<img src="${currentImage}" alt="Preview">`;
+      }
+      
+      renderAdicionaisList();
       document.getElementById("editAlert").innerHTML = '';
       document.getElementById("editModal").classList.add("active");
     }
@@ -386,6 +499,59 @@
     function closeEditModal() {
       document.getElementById("editModal").classList.remove("active");
       editingProduct = null;
+      currentImage = null;
+      temporaryAdicionais = [];
+    }
+
+    function handleImageUpload() {
+      const file = document.getElementById("imageInput").files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          currentImage = e.target.result;
+          const preview = document.getElementById("imagePreview");
+          preview.innerHTML = `<img src="${currentImage}" alt="Preview">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function addAdicional() {
+      const nome = document.getElementById("novoAdicionalNome").value.trim();
+      const preco = parseFloat(document.getElementById("novoAdicionalPreco").value) || 0;
+
+      if (!nome) {
+        showAlert("❌ Preencha o nome do adicional", "editAlert");
+        return;
+      }
+
+      temporaryAdicionais.push({ nome, preco });
+      document.getElementById("novoAdicionalNome").value = '';
+      document.getElementById("novoAdicionalPreco").value = '';
+      renderAdicionaisList();
+    }
+
+    function removeAdicional(index) {
+      temporaryAdicionais.splice(index, 1);
+      renderAdicionaisList();
+    }
+
+    function renderAdicionaisList() {
+      const lista = document.getElementById("adicionaisList");
+      if (temporaryAdicionais.length === 0) {
+        lista.innerHTML = '<p style="color: var(--secondary); text-align: center; font-size: 0.9em;">Nenhum adicional</p>';
+        return;
+      }
+
+      lista.innerHTML = temporaryAdicionais.map((a, i) => `
+        <div class="adicional-item">
+          <div class="adicional-info">
+            <div class="adicional-name">${a.nome}</div>
+            <div class="adicional-price">+R$ ${a.preco.toFixed(2)}</div>
+          </div>
+          <button type="button" class="btn-remove-adicional" onclick="removeAdicional(${i})">✕</button>
+        </div>
+      `).join("");
     }
 
     async function saveProduct(event) {
@@ -401,7 +567,6 @@
         return;
       }
 
-      // Atualizar no array local
       const index = products.findIndex(p => p.id === editingProduct.id);
       if (index !== -1) {
         products[index] = {
@@ -409,10 +574,12 @@
           nome: nome,
           descricao: descricao,
           preco: preco,
-          categoria: categoria
+          categoria: categoria,
+          foto: currentImage || products[index].foto,
+          adicionais: temporaryAdicionais
         };
         
-        showAlert("✅ Produto atualizado com sucesso!", "editAlert");
+        showAlert("✅ Produto salvo com sucesso!", "editAlert");
         
         setTimeout(() => {
           closeEditModal();
@@ -462,7 +629,8 @@
           id: currentProduct.id,
           nome: currentProduct.nome,
           preco: currentProduct.preco,
-          qty: currentQty
+          qty: currentQty,
+          adicionais: currentProduct.adicionais || []
         });
       }
       
