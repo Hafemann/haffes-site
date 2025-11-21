@@ -1508,17 +1508,41 @@
       document.getElementById(tab === 'add' ? 'addTab' : tab === 'list' ? 'listTab' : 'editTab').classList.add('active');
     }
 
-    // ===== CARREGA PRODUTOS =====
-    async function loadProducts() {
-      try {
-        const response = await fetch(`${APPS_SCRIPT_URL}?action=getProdutos`);
-        products = await response.json();
-        renderMenu();
-      } catch (error) {
-        console.error("Erro ao carregar produtos:", error);
-        showAlert("❌ Erro ao carregar produtos", "modalAlert");
-      }
-    }
+    // ===== CARREGA PRODUTOS (COM WORKAROUND CORS) =====
+async function loadProducts() {
+  try {
+    const response = await fetch(`${APPS_SCRIPT_URL}?action=getProdutos`, {
+      method: 'GET',
+      mode: 'no-cors'
+    });
+    
+    // Com no-cors, precisamos fazer de outro jeito
+    // Vamos usar JSONP como fallback
+    loadProductsViaJSONP();
+  } catch (error) {
+    console.error("Erro ao carregar produtos (tentando JSONP):", error);
+    loadProductsViaJSONP();
+  }
+}
+
+function loadProductsViaJSONP() {
+  try {
+    // Criar callback
+    window.handleProducts = function(data) {
+      products = data;
+      renderMenu();
+    };
+    
+    // Criar script dinamicamente
+    const script = document.createElement('script');
+    script.src = `${APPS_SCRIPT_URL}?action=getProdutosJSON&callback=handleProducts`;
+    document.head.appendChild(script);
+  } catch (error) {
+    console.error("Erro ao carregar produtos via JSONP:", error);
+    showAlert("❌ Erro ao carregar produtos", "modalAlert");
+  }
+}
+
 
     function renderMenu() {
       const menuSection = document.getElementById("menuSection");
@@ -2154,6 +2178,7 @@
   </script>
 </body>
 </html>
+
 
 
 
