@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Haffe's Hamburgueria | Cardápio Online</title>
+  <!-- Stripe.js -->
+  <script src="https://js.stripe.com/v3/"></script>
   <style>
     * {
       margin: 0;
@@ -36,7 +38,6 @@
       position: relative;
     }
 
-    /* Efeito de luz de fundo */
     body::before {
       content: '';
       position: fixed;
@@ -49,7 +50,7 @@
       z-index: 1;
     }
 
-    /* ===== HEADER ===== */
+    /* HEADER */
     header {
       background: linear-gradient(90deg, var(--dark) 0%, rgba(255, 102, 0, 0.1) 50%, var(--dark) 100%);
       padding: 16px 20px;
@@ -125,7 +126,7 @@
       box-shadow: var(--shadow-md);
     }
 
-    /* ===== CONTAINER ===== */
+    /* CONTAINER */
     .wrapper {
       display: grid;
       grid-template-columns: 1fr 400px;
@@ -151,7 +152,7 @@
       }
     }
 
-    /* ===== MENU SECTION ===== */
+    /* MENU SECTION */
     .menu-section {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -263,7 +264,7 @@
       transform: scale(0.95);
     }
 
-    /* ===== CARRINHO LATERAL ===== */
+    /* CARRINHO */
     .cart-sidebar {
       position: sticky;
       top: 100px;
@@ -413,7 +414,7 @@
       opacity: 0.5;
     }
 
-    /* ===== MODAL ===== */
+    /* MODAL */
     .modal {
       display: none;
       position: fixed;
@@ -646,7 +647,7 @@
       box-shadow: var(--shadow-lg);
     }
 
-    /* ===== CHECKOUT MODAL ===== */
+    /* CHECKOUT MODAL */
     .checkout-modal {
       display: none;
     }
@@ -780,7 +781,7 @@
       display: block;
     }
 
-    /* ===== ADMIN PANEL ===== */
+    /* ADMIN PANEL */
     .admin-panel {
       display: none;
       max-width: 1100px;
@@ -972,6 +973,64 @@
       margin-top: 8px;
     }
 
+    /* Stripe Elements */
+    .StripeElement {
+      padding: 12px;
+      background: rgba(255, 102, 0, 0.08);
+      border: 1px solid rgba(255, 102, 0, 0.2);
+      border-radius: 8px;
+      font-size: 1em;
+    }
+
+    .StripeElement--focus {
+      border-color: var(--primary);
+      background: rgba(255, 102, 0, 0.12);
+      box-shadow: 0 0 15px rgba(255, 102, 0, 0.2);
+    }
+
+    /* PIX Modal */
+    .pix-container {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .pix-qr {
+      width: 280px;
+      height: 280px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .pix-qr img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .pix-copy {
+      background: rgba(255, 102, 0, 0.15);
+      border: 1px solid rgba(255, 102, 0, 0.3);
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pix-copy:hover {
+      background: rgba(255, 102, 0, 0.25);
+    }
+
+    .pix-copy code {
+      color: var(--light-text);
+      font-family: monospace;
+      font-size: 0.9em;
+      word-break: break-all;
+    }
+
     @media (max-width: 768px) {
       .wrapper {
         grid-template-columns: 1fr;
@@ -1010,6 +1069,11 @@
 
       .modal-content {
         width: 95%;
+      }
+
+      .pix-qr {
+        width: 200px;
+        height: 200px;
       }
     }
   </style>
@@ -1280,19 +1344,29 @@
             <label>💳 Forma de Pagamento *</label>
             <div class="payment-options">
               <label class="payment-option selected">
-                <input type="radio" name="payment" value="PIX" checked>
+                <input type="radio" name="payment" value="PIX" checked onchange="updatePaymentUI()">
                 💳 PIX
               </label>
               <label class="payment-option">
-                <input type="radio" name="payment" value="CARTAO">
-                💰 Cartão
+                <input type="radio" name="payment" value="STRIPE" onchange="updatePaymentUI()">
+                💰 Cartão (Stripe)
               </label>
             </div>
           </div>
 
+          <!-- PIX Info -->
           <div id="pixInfo" style="background: rgba(76, 175, 80, 0.15); padding: 12px; border-radius: 8px; margin-bottom: 15px; display: block; border-left: 4px solid #4caf50;">
             <strong style="color: #90ee90;">💡 PIX QR Code:</strong>
             <p style="font-size: 0.9em; color: var(--secondary-text); margin-top: 5px;">Você receberá um QR Code para escanear após confirmar o pedido.</p>
+          </div>
+
+          <!-- Stripe Form -->
+          <div id="stripePaymentSection" style="display: none;">
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label>Informações do Cartão *</label>
+              <div id="card-element" class="StripeElement"></div>
+            </div>
+            <div id="card-errors" role="alert" style="color: #ff6b6b; margin-bottom: 10px;"></div>
           </div>
 
           <div class="form-group">
@@ -1308,10 +1382,41 @@
     </div>
   </div>
 
+  <!-- MODAL PIX -->
+  <div id="pixModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>💳 PIX - Escaneie o QR Code</h2>
+        <button class="close-btn" onclick="closePixModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="pix-container">
+          <p style="color: var(--secondary-text); margin-bottom: 16px;">Pedido: <strong id="pixOrderId"></strong></p>
+          <p style="color: var(--light-text); margin-bottom: 20px; font-size: 1.2em; font-weight: bold;">
+            Total: R$ <span id="pixAmount">0,00</span>
+          </p>
+          <p style="color: var(--secondary-text); margin-bottom: 16px;">Escaneie o código QR com seu celular:</p>
+          <div class="pix-qr" id="pixQrCode"></div>
+          <p style="color: var(--secondary-text); margin-top: 16px;">Ou copie a chave PIX Copia e Cola:</p>
+          <div class="pix-copy" onclick="copyPixKey()">
+            <code id="pixKey"></code>
+          </div>
+          <button class="btn-checkout" onclick="closePixModal()" style="margin-top: 20px;">✓ Já Paguei</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ===== CONFIGURAÇÃO =====
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfvegVxJd13StH0S-rAJUx_NUd7hdsVufpllmMUiHkpTlZZtDeWzqpEsxHPng2t1zfJw/exec";
+    const APPS_SCRIPT_URL = "COLE_SUA_URL_DO_APPS_SCRIPT_AQUI";
+    const STRIPE_PUBLIC_KEY = "pk_test_51SPnzVGZ9m2QWLCwXuMRC58zYv4wOVx1UTqc0Crp87YSbHmxFOBCvoU4ZQWaCY8MXtQRsFEGIOavZADYcBSrM0Cb00aLSWrU89";
+    const PIX_KEY = "05455571192";
+    const NOME_LOJA = "Haffe's Hamburgueria";
     
+    let stripe = null;
+    let cardElement = null;
+
     let products = [];
     let cart = [];
     let currentProduct = null;
@@ -1323,7 +1428,37 @@
     let adminMode = false;
     let productosParaEdicao = [];
 
-    // ===== UPLOAD DE IMAGEM EM BASE64 =====
+    // ===== INICIALIZAR STRIPE =====
+    function initStripe() {
+      stripe = Stripe(STRIPE_PUBLIC_KEY);
+      const elements = stripe.elements();
+      cardElement = elements.create('card', {
+        style: {
+          base: {
+            color: '#fff',
+            fontFamily: 'Segoe UI, Arial, sans-serif',
+            fontSize: '16px',
+            '::placeholder': {
+              color: '#b0b0b0'
+            }
+          },
+          invalid: {
+            color: '#ff6b6b'
+          }
+        }
+      });
+      cardElement.mount('#card-element');
+      cardElement.addEventListener('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+          displayError.textContent = event.error.message;
+        } else {
+          displayError.textContent = '';
+        }
+      });
+    }
+
+    // ===== UPLOAD DE IMAGEM =====
     document.getElementById('prodFotoFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -1596,10 +1731,27 @@
         return;
       }
       document.getElementById("checkoutModal").classList.add("active");
+      if (!stripe) {
+        setTimeout(initStripe, 100);
+      }
     }
 
     function closeCheckout() {
       document.getElementById("checkoutModal").classList.remove("active");
+    }
+
+    function updatePaymentUI() {
+      const payment = document.querySelector('input[name="payment"]:checked').value;
+      const pixInfo = document.getElementById("pixInfo");
+      const stripeSection = document.getElementById("stripePaymentSection");
+
+      if (payment === "PIX") {
+        pixInfo.style.display = "block";
+        stripeSection.style.display = "none";
+      } else {
+        pixInfo.style.display = "none";
+        stripeSection.style.display = "block";
+      }
     }
 
     // ===== CHECKOUT =====
@@ -1627,40 +1779,107 @@
       form.style.display = "none";
 
       try {
-        const response = await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          payload: JSON.stringify({
-            action: "criarPedido",
-            cliente: name,
-            telefone: phone,
-            endereco: `${address}, ${neighborhood}`,
-            itens: cart,
-            valorTotal: total,
-            tipoPagamento: payment,
-            observacoes: finalObs,
-            comprovantePIX: ""
-          })
-        });
+        if (payment === "PIX") {
+          // PIX - criar pedido e mostrar QR code
+          const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            payload: JSON.stringify({
+              action: "criarPedido",
+              cliente: name,
+              telefone: phone,
+              endereco: `${address}, ${neighborhood}`,
+              itens: cart,
+              valorTotal: total,
+              tipoPagamento: payment,
+              observacoes: finalObs,
+              comprovantePIX: ""
+            })
+          });
 
-        const resultado = await response.json();
+          const resultado = await response.json();
 
-        if (resultado.sucesso) {
-          showAlert("✅ Pedido confirmado com sucesso!", "checkoutAlert");
-          setTimeout(() => {
-            alert(`Pedido realizado com sucesso!\n\nID: ${resultado.pedidoID.substring(0, 8)}\n\nValor: R$ ${total.toFixed(2)}\n\nVocê receberá atualizações por WhatsApp`);
-            cart = [];
-            couponDiscount = 0;
-            updateCart();
+          if (resultado.sucesso) {
+            // Gerar QR code PIX
+            const pixQrUrl = gerarQRCodePIX(total);
+            document.getElementById("pixOrderId").textContent = resultado.pedidoID.substring(0, 8);
+            document.getElementById("pixAmount").textContent = total.toFixed(2);
+            document.getElementById("pixKey").textContent = gerarPixCopiaCola(total);
+            document.getElementById("pixQrCode").innerHTML = `<img src="${pixQrUrl}" alt="QR Code PIX">`;
+            
             closeCheckout();
-            document.getElementById("checkoutForm").reset();
-            document.getElementById("couponInput").value = "";
+            document.getElementById("pixModal").classList.add("active");
+            
+            showAlert("✅ Pedido criado! Escaneie o QR Code para pagar", "checkoutAlert");
+            
+            // Enviar WhatsApp
+            enviarWhatsAppNotificacao(phone, name, resultado.pedidoID.substring(0, 8), total);
+
+            // Limpar carrinho
+            setTimeout(() => {
+              cart = [];
+              couponDiscount = 0;
+              updateCart();
+              document.getElementById("checkoutForm").reset();
+              document.getElementById("couponInput").value = "";
+              form.style.display = "block";
+              loading.classList.remove("active");
+            }, 1500);
+          } else {
+            showAlert(`❌ Erro: ${resultado.erro || "Não foi possível processar o pedido"}`, "checkoutAlert");
             form.style.display = "block";
             loading.classList.remove("active");
-          }, 1500);
+          }
         } else {
-          showAlert(`❌ Erro: ${resultado.erro || "Não foi possível processar o pedido"}`, "checkoutAlert");
-          form.style.display = "block";
-          loading.classList.remove("active");
+          // STRIPE - criar token e enviar
+          if (!stripe || !cardElement) {
+            initStripe();
+          }
+
+          const { token, error } = await stripe.createToken(cardElement);
+
+          if (error) {
+            showAlert(`❌ Erro no cartão: ${error.message}`, "checkoutAlert");
+            form.style.display = "block";
+            loading.classList.remove("active");
+            return;
+          }
+
+          // Criar pedido com Stripe
+          const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            payload: JSON.stringify({
+              action: "criarPedidoStripe",
+              cliente: name,
+              telefone: phone,
+              endereco: `${address}, ${neighborhood}`,
+              itens: cart,
+              valorTotal: total,
+              tipoPagamento: "STRIPE",
+              observacoes: finalObs,
+              stripeToken: token.id
+            })
+          });
+
+          const resultado = await response.json();
+
+          if (resultado.sucesso) {
+            showAlert("✅ Pagamento processado! Pedido confirmado", "checkoutAlert");
+            setTimeout(() => {
+              alert(`Pedido realizado com sucesso!\n\nID: ${resultado.pedidoID.substring(0, 8)}\nValor: R$ ${total.toFixed(2)}\n\nVocê receberá atualizações por WhatsApp`);
+              cart = [];
+              couponDiscount = 0;
+              updateCart();
+              closeCheckout();
+              document.getElementById("checkoutForm").reset();
+              document.getElementById("couponInput").value = "";
+              form.style.display = "block";
+              loading.classList.remove("active");
+            }, 1500);
+          } else {
+            showAlert(`❌ Erro: ${resultado.erro || "Falha no pagamento"}`, "checkoutAlert");
+            form.style.display = "block";
+            loading.classList.remove("active");
+          }
         }
       } catch (error) {
         console.error("Erro:", error);
@@ -1670,11 +1889,61 @@
       }
     });
 
+    // ===== PIX =====
+    function gerarQRCodePIX(valor) {
+      const pixCopiaCola = gerarPixCopiaCola(valor);
+      return `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(pixCopiaCola)}`;
+    }
+
+    function gerarPixCopiaCola(valor) {
+      const payload = [
+        "000201",
+        "26580014br.gov.bcb.pix",
+        "01" + PIX_KEY.length + PIX_KEY,
+        "520400005303986",
+        "5406" + valor.toFixed(2),
+        "5802BR",
+        "5913" + NOME_LOJA.substring(0,13),
+        "6009SAOPAULO",
+        "62140506SITE01",
+        "6304"
+      ].join("");
+      return payload;
+    }
+
+    function closePixModal() {
+      document.getElementById("pixModal").classList.remove("active");
+    }
+
+    function copyPixKey() {
+      const pixKey = document.getElementById("pixKey").textContent;
+      navigator.clipboard.writeText(pixKey).then(() => {
+        alert("✅ Chave PIX copiada!");
+      });
+    }
+
+    // ===== WHATSAPP =====
+    async function enviarWhatsAppNotificacao(telefone, cliente, pedidoId, valor) {
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          payload: JSON.stringify({
+            action: "enviarWhatsApp",
+            telefone: telefone,
+            mensagem: `Olá ${cliente}! ✅\n\nSeu pedido foi recebido!\nID: ${pedidoId}\nValor: R$ ${valor.toFixed(2)}\n\nStatus: Aguardando pagamento PIX...\n\nObrigado! 🍔`
+          })
+        });
+      } catch (error) {
+        console.error("Erro ao enviar WhatsApp:", error);
+      }
+    }
+
     // ===== PAGAMENTO =====
     document.querySelectorAll('input[name="payment"]').forEach(radio => {
       radio.addEventListener("change", function() {
         document.querySelectorAll(".payment-option").forEach(opt => opt.classList.remove("selected"));
         this.closest(".payment-option").classList.add("selected");
+        updatePaymentUI();
       });
     });
 
@@ -1755,7 +2024,7 @@
       }
     }
 
-    // ===== ADMIN: CARREGAR PRODUTOS PARA EDIÇÃO =====
+    // ===== ADMIN: CARREGAR PARA EDIÇÃO =====
     async function carregarProdutosParaEdicao() {
       try {
         const response = await fetch(`${APPS_SCRIPT_URL}?action=getProdutos`);
@@ -1843,7 +2112,7 @@
       }
     });
 
-    // ===== ADMIN: DELETAR PRODUTO =====
+    // ===== ADMIN: DELETAR =====
     async function deleteProduct(productId) {
       if (!confirm("Tem certeza que deseja deletar este produto?")) return;
 
