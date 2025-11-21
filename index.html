@@ -158,15 +158,13 @@
 // ===== CARREGA PRODUTOS VIA CSV =====
 async function loadProducts() {
   try {
-    // URL CSV da planilha - SUBSTITUA O ID AQUI
+    // URL CSV da planilha
     const SHEETS_URL = "https://docs.google.com/spreadsheets/d/SEU_ID_AQUI/gviz/tq?tqx=out:csv&sheet=Produtos";
     
     const response = await fetch(SHEETS_URL);
     const csv = await response.text();
     
-    console.log("CSV recebido:", csv); // Debug
-    
-    // Parse CSV melhorado
+    // Parse CSV linha por linha
     const lines = csv.trim().split('\n');
     products = [];
     
@@ -174,45 +172,57 @@ async function loadProducts() {
       const line = lines[i].trim();
       if (!line) continue;
       
-      // Parser de CSV robusto que lida com aspas
-      const values = [];
-      let current = '';
-      let inQuotes = false;
+      // Split by comma, mas respeita aspas
+      const regex = /("([^"]*)"|[^,]+)/g;
+      const match = line.match(regex);
+      const values = match ? match.map(v => v.replace(/"/g, '').trim()) : [];
       
-      for (let j = 0; j < line.length; j++) {
-        const char = line[j];
-        
-        if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          values.push(current.trim());
-          current = '';
-        } else {
-          current += char;
+      if (values.length >= 5 && values[0]) {
+        try {
+          // Extrai preço da coluna D (índice 3)
+          let preco = 0;
+          const precoStr = values[3];
+          
+          // Remove "R$" se tiver e converte vírgula para ponto
+          if (precoStr) {
+            preco = parseFloat(
+              precoStr
+                .replace('R$', '')
+                .replace(',', '.')
+                .trim()
+            );
+          }
+          
+          // Se preco for NaN ou 0, tenta encontrar número em qualquer posição
+          if (!preco || isNaN(preco)) {
+            const numbers = precoStr.match(/(\d+[.,]\d+|\d+)/g);
+            if (numbers && numbers.length > 0) {
+              preco = parseFloat(numbers[numbers.length - 1].replace(',', '.'));
+            }
+          }
+          
+          products.push({
+            id: values[0],
+            nome: values[1] || "Produto",
+            descricao: values[2] || "",
+            preco: preco || 0,
+            categoria: values[4] || "",
+            foto: values[5] || ""
+          });
+        } catch (e) {
+          console.error("Erro ao processar linha", i, ":", e);
         }
       }
-      values.push(current.trim());
-      
-      // Remover aspas finais
-      const clean = values.map(v => v.replace(/"/g, '').trim());
-      
-      console.log("Row", i, ":", clean); // Debug
-      
-      if (clean[0]) { // Se tiver ID
-        const preco = parseFloat(clean[3]?.replace('R$', '').replace(',', '.').trim()) || 0;
-        
-        products.push({
-          id: clean[0],
-          nome: clean[1] || "Produto",
-          descricao: clean[2] || "",
-          preco: preco,
-          categoria: clean[4] || "",
-          foto: clean[5] || ""
-        });
-        
-        console.log("Produto adicionado:", clean[1], "- Preço:", preco);
-      }
     }
+    
+    console.log("Produtos carregados:", products);
+    renderMenu();
+  } catch (error) {
+    console.error("Erro ao carregar CSV:", error);
+    document.getElementById("menuSection").innerHTML = '<p style="grid-column: 1/-1; color: red; text-align: center;">❌ Erro: ' + error.message + '</p>';
+  }
+}
+
     
     console.log("Total de produtos:", products.length);
     renderMenu();
@@ -317,4 +327,5 @@ async function loadProducts() {
   </script>
 </body>
 </html>
+
 
