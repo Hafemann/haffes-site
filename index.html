@@ -32,6 +32,7 @@
     }
     header h1 { color: var(--primary); font-size: 1.8em; }
     header p { color: #FFE4CC; font-size: 0.9em; margin: 0; }
+    .header-actions { display: flex; gap: 10px; }
     .btn { background: var(--primary); color: #000; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
     .btn:hover { background: #ff8533; transform: translateY(-2px); }
     .wrapper { display: grid; grid-template-columns: 1fr 380px; gap: 20px; padding: 30px 20px; max-width: 1500px; margin: 0 auto; }
@@ -43,8 +44,10 @@
       cursor: pointer;
       overflow: hidden;
       transition: all 0.3s;
+      position: relative;
     }
     .product-card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255, 102, 0, 0.2); }
+    .product-card.edit-mode { border-color: var(--primary); box-shadow: 0 0 20px rgba(255, 102, 0, 0.3); }
     .product-img { width: 100%; height: 180px; background: linear-gradient(135deg, var(--primary), #ff8533); }
     .product-info { padding: 16px; }
     .product-name { color: var(--primary); font-size: 1.1em; font-weight: bold; margin-bottom: 4px; }
@@ -54,6 +57,9 @@
     .btn-add { background: var(--primary); color: #000; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
     .btn-add:hover { background: #ff8533; }
     .btn-add:active { transform: scale(0.95); }
+    .product-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; }
+    .btn-edit-product { background: #2196F3; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; transition: 0.2s; }
+    .btn-edit-product:hover { background: #21BBF3; }
     .cart-sidebar {
       position: sticky;
       top: 100px;
@@ -108,6 +114,31 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .remove-btn { background: #d32f2f; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 0.8em; transition: 0.2s; }
     .remove-btn:hover { background: #f44336; }
+    
+    /* Edit Modal Styles */
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; color: var(--primary); font-weight: bold; margin-bottom: 6px; font-size: 0.9em; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 102, 0, 0.08);
+      border: 1px solid rgba(255, 102, 0, 0.2);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95em;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(255, 102, 0, 0.12);
+      box-shadow: 0 0 10px rgba(255, 102, 0, 0.15);
+    }
+    .form-group textarea { min-height: 70px; resize: vertical; }
+    .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid; }
+    .alert.success { background: rgba(76, 175, 80, 0.15); border-left-color: #4caf50; color: #90ee90; }
+    .alert.error { background: rgba(211, 47, 47, 0.15); border-left-color: #d32f2f; color: #ff6b6b; }
+    
     @media (max-width: 1024px) {
       .wrapper { grid-template-columns: 1fr; }
       .cart-sidebar { position: static; }
@@ -121,7 +152,8 @@
       <h1>🍔 Haffe's Hamburgueria</h1>
       <p>Cardápio Online</p>
     </div>
-    <div>
+    <div class="header-actions">
+      <button class="btn" onclick="toggleEditMode()">✏️ Editar</button>
       <button class="btn" onclick="location.reload()">🔄 Atualizar</button>
     </div>
   </header>
@@ -180,11 +212,58 @@
     </div>
   </div>
 
+  <!-- MODAL EDITAR PRODUTO -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>✏️ Editar Produto</h2>
+        <button class="close-btn" onclick="closeEditModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="editAlert"></div>
+        
+        <form id="editForm" onsubmit="saveProduct(event)">
+          <div class="form-group">
+            <label>Nome do Produto *</label>
+            <input type="text" id="editNome" required>
+          </div>
+
+          <div class="form-group">
+            <label>Descrição *</label>
+            <textarea id="editDesc" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Preço (R$) *</label>
+            <input type="number" id="editPreco" step="0.01" required min="0">
+          </div>
+
+          <div class="form-group">
+            <label>Categoria *</label>
+            <select id="editCategoria" required>
+              <option value="Hambúrguer">Hambúrguer</option>
+              <option value="Acompanhamento">Acompanhamento</option>
+              <option value="Bebida">Bebida</option>
+              <option value="Sobremesa">Sobremesa</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn-cancel" onclick="closeEditModal()" style="flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Cancelar</button>
+            <button type="submit" class="btn-confirm" style="flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
     let products = [];
     let cart = [];
     let currentProduct = null;
     let currentQty = 1;
+    let editMode = false;
+    let editingProduct = null;
 
     // ===== CARREGA PRODUTOS VIA CSV =====
     async function loadProducts() {
@@ -203,7 +282,6 @@
           const line = lines[i].trim();
           if (!line) continue;
           
-          // Parser de CSV robusto
           const regex = /("([^"]*)"|[^,]+)/g;
           const match = line.match(regex) || [];
           const values = match.map(v => v.replace(/"/g, '').trim());
@@ -222,7 +300,6 @@
                 );
               }
               
-              // Fallback para encontrar número se parse falhar
               if (!preco || isNaN(preco)) {
                 const numbers = precoStr.match(/(\d+[.,]\d+|\d+)/g);
                 if (numbers && numbers.length > 0) {
@@ -259,21 +336,30 @@
       }
       
       section.innerHTML = products.map(p => `
-        <div class="product-card" onclick="openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">
-          <div class="product-img"></div>
-          <div class="product-info">
-            <div class="product-name">${p.nome}</div>
-            <div class="product-desc">${p.descricao}</div>
-            <div class="product-footer">
-              <span class="product-price">R$ ${p.preco.toFixed(2)}</span>
-              <button class="btn-add" onclick="event.stopPropagation(); openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">+</button>
+        <div class="product-card ${editMode ? 'edit-mode' : ''}">
+          ${editMode ? `<div class="product-actions"><button class="btn-edit-product" onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">✏️ Editar</button></div>` : ''}
+          <div onclick="${editMode ? '' : `openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})`}" style="cursor: ${editMode ? 'default' : 'pointer'};">
+            <div class="product-img"></div>
+            <div class="product-info">
+              <div class="product-name">${p.nome}</div>
+              <div class="product-desc">${p.descricao}</div>
+              <div class="product-footer">
+                <span class="product-price">R$ ${p.preco.toFixed(2)}</span>
+                <button class="btn-add" ${editMode ? 'style="display:none"' : ''} onclick="event.stopPropagation(); openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">+</button>
+              </div>
             </div>
           </div>
         </div>
       `).join("");
     }
 
+    function toggleEditMode() {
+      editMode = !editMode;
+      renderMenu();
+    }
+
     function openModal(product) {
+      if (editMode) return;
       currentProduct = product;
       currentQty = 1;
       document.getElementById("modalName").textContent = product.nome;
@@ -285,6 +371,64 @@
 
     function closeModal() {
       document.getElementById("productModal").classList.remove("active");
+    }
+
+    function openEditModal(product) {
+      editingProduct = product;
+      document.getElementById("editNome").value = product.nome;
+      document.getElementById("editDesc").value = product.descricao;
+      document.getElementById("editPreco").value = product.preco;
+      document.getElementById("editCategoria").value = product.categoria;
+      document.getElementById("editAlert").innerHTML = '';
+      document.getElementById("editModal").classList.add("active");
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").classList.remove("active");
+      editingProduct = null;
+    }
+
+    async function saveProduct(event) {
+      event.preventDefault();
+      
+      const nome = document.getElementById("editNome").value.trim();
+      const descricao = document.getElementById("editDesc").value.trim();
+      const preco = parseFloat(document.getElementById("editPreco").value);
+      const categoria = document.getElementById("editCategoria").value;
+
+      if (!nome || !descricao || !preco || !categoria) {
+        showAlert("❌ Preencha todos os campos", "editAlert");
+        return;
+      }
+
+      // Atualizar no array local
+      const index = products.findIndex(p => p.id === editingProduct.id);
+      if (index !== -1) {
+        products[index] = {
+          ...products[index],
+          nome: nome,
+          descricao: descricao,
+          preco: preco,
+          categoria: categoria
+        };
+        
+        showAlert("✅ Produto atualizado com sucesso!", "editAlert");
+        
+        setTimeout(() => {
+          closeEditModal();
+          renderMenu();
+        }, 1500);
+      }
+    }
+
+    function showAlert(message, elementId) {
+      const alertDiv = document.getElementById(elementId);
+      const isSuccess = message.includes("✅");
+      alertDiv.innerHTML = `<div class="alert ${isSuccess ? 'success' : 'error'}">${message}</div>`;
+      
+      if (isSuccess) {
+        setTimeout(() => alertDiv.innerHTML = '', 2000);
+      }
     }
 
     function increaseQty() {
@@ -370,5 +514,3 @@
   </script>
 </body>
 </html>
-
-
