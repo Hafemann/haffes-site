@@ -30,7 +30,7 @@
       border-bottom: 1px solid rgba(255, 102, 0, 0.2);
     }
     .logo-section { display: flex; align-items: center; gap: 12px; }
-    .logo-display { width: 50px; height: 50px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 28px; overflow: hidden; object-fit: cover; }
+    .logo-display { width: 50px; height: 50px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 28px; overflow: hidden; }
     .logo-display img { width: 100%; height: 100%; object-fit: cover; }
     header h1 { color: var(--primary); font-size: 1.8em; }
     .header-actions { display: flex; gap: 10px; }
@@ -67,13 +67,6 @@
     }
     .cart-title { color: var(--primary); font-size: 1.3em; margin-bottom: 15px; font-weight: bold; }
     .cart-items { max-height: 300px; overflow-y: auto; margin-bottom: 15px; }
-    .cart-item {
-      background: rgba(255, 102, 0, 0.1);
-      padding: 10px;
-      margin-bottom: 8px;
-      border-left: 3px solid var(--primary);
-      border-radius: 6px;
-    }
     .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
     .summary-row.total { color: #FFE4CC; font-size: 1.2em; font-weight: bold; border-top: 1px solid rgba(255, 102, 0, 0.2); padding-top: 10px; margin-top: 10px; }
     .btn-checkout { width: 100%; background: var(--primary); color: #000; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
@@ -129,7 +122,7 @@
     </div>
     <div class="header-actions">
       <button class="btn hidden" id="configBtn" onclick="toggleConfig()">⚙️ Config</button>
-      <button class="btn hidden" id="editBtn" onclick="toggleEditMode()">✏️ Editar</button>
+      <button class="btn hidden" id="editBtn">✏️ Editar</button>
       <button class="btn hidden" id="logoutBtn" onclick="logout()">🚪 Sair</button>
       <button class="btn" id="loginBtn" onclick="openLoginModal()">🔐 Admin</button>
       <button class="btn" onclick="location.reload()">🔄 Atualizar</button>
@@ -150,7 +143,7 @@
     <div class="config-content active" id="generalTab">
       <div class="form-group">
         <label>Nome do Site</label>
-        <input type="text" id="configSiteName" placeholder="Ex: Haffe's Hamburgueria">
+        <input type="text" id="configSiteName" placeholder="Ex: Haffe's">
       </div>
       <div class="form-group">
         <label>Subtítulo</label>
@@ -162,7 +155,7 @@
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
           <input type="text" id="configLogo" placeholder="Ex: 🍔" maxlength="5" style="flex: 1;">
           <label class="file-label">
-            📁 PNG
+            PNG
             <input type="file" id="logoFile" accept="image/png" onchange="handleLogoUpload()">
           </label>
         </div>
@@ -173,6 +166,9 @@
         <label>Taxa de Entrega (R$)</label>
         <input type="number" id="configDelivery" step="0.01" min="0" placeholder="5.00">
       </div>
+
+      <button class="btn" onclick="saveConfigLocal()" style="width: 100%; padding: 12px; margin-top: 20px;">💾 Salvar Localmente</button>
+      <p style="color: var(--secondary); font-size: 0.85em; margin-top: 10px;">* As alterações são salvas no seu navegador</p>
     </div>
 
     <!-- TAB: CORES -->
@@ -181,6 +177,7 @@
         <label>Cor Primária</label>
         <input type="color" id="configPrimaryColor" value="#FF6600">
       </div>
+      <button class="btn" onclick="saveConfigLocal()" style="width: 100%; padding: 12px; margin-top: 20px;">💾 Salvar</button>
     </div>
 
     <!-- TAB: PERGUNTAS -->
@@ -199,9 +196,8 @@
         <input type="checkbox" id="pergGuardanapo" checked style="margin-right: 10px;">
         Guardanapos?
       </label>
+      <button class="btn" onclick="saveConfigLocal()" style="width: 100%; padding: 12px; margin-top: 20px;">💾 Salvar</button>
     </div>
-
-    <button class="btn" onclick="saveConfig()" style="width: 100%; margin-top: 20px; padding: 12px;">💾 Salvar</button>
   </div>
 
   <div class="wrapper" id="cardapioWrapper" style="display: grid;">
@@ -339,7 +335,7 @@
             <label>📷 Imagem</label>
             <div class="image-preview" id="imagePreview">Nenhuma</div>
             <label class="file-label">
-              📁 Upload
+              Upload
               <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload()">
             </label>
           </div>
@@ -404,11 +400,12 @@
     let selectedAdicionais = {};
     let selectedMeatPoint = null;
     let selectedPerguntas = {};
+    let editMode = false;
+
     let config = {
       siteName: "Haffe's Hamburgueria",
       siteSubtitle: "Cardápio Online",
       logo: "🍔",
-      logoImage: null,
       primaryColor: "#FF6600",
       deliveryFee: 5.00,
       pergMaionese: true,
@@ -416,19 +413,33 @@
       pergGuardanapo: true
     };
 
-    // ===== CARREGAR CONFIG DO APPS SCRIPT =====
-    async function loadConfig() {
-      try {
-        const response = await fetch(APPS_SCRIPT_URL + "?action=getConfig");
-        const data = await response.json();
-        if (data && Object.keys(data).length > 0) {
-          config = {...config, ...data};
+    // ===== SALVAR NO LOCALSTORAGE =====
+    function saveConfigLocal() {
+      config.siteName = document.getElementById("configSiteName").value;
+      config.siteSubtitle = document.getElementById("configSiteSubtitle").value;
+      config.logo = document.getElementById("configLogo").value;
+      config.primaryColor = document.getElementById("configPrimaryColor").value;
+      config.deliveryFee = parseFloat(document.getElementById("configDelivery").value) || 5;
+      config.pergMaionese = document.getElementById("pergMaionese").checked;
+      config.pergKetchup = document.getElementById("pergKetchup").checked;
+      config.pergGuardanapo = document.getElementById("pergGuardanapo").checked;
+
+      localStorage.setItem("haffeConfig", JSON.stringify(config));
+      alert("✅ Configurações salvas!");
+      applyConfig();
+    }
+
+    // ===== CARREGAR DO LOCALSTORAGE =====
+    function loadConfigLocal() {
+      const saved = localStorage.getItem("haffeConfig");
+      if (saved) {
+        try {
+          config = JSON.parse(saved);
+        } catch(e) {
+          console.log("Usando config padrão");
         }
-        applyConfig();
-      } catch(e) {
-        console.log("Usando config padrão");
-        applyConfig();
       }
+      applyConfig();
     }
 
     function applyConfig() {
@@ -437,11 +448,7 @@
       document.getElementById("siteSubtitle").textContent = config.siteSubtitle;
       
       const logoDisplay = document.getElementById("logoDisplay");
-      if (config.logoImage) {
-        logoDisplay.innerHTML = `<img src="${config.logoImage}" alt="Logo">`;
-      } else {
-        logoDisplay.textContent = config.logo || "🍔";
-      }
+      logoDisplay.textContent = config.logo || "🍔";
       
       document.getElementById("deliveryFee").textContent = `R$ ${parseFloat(config.deliveryFee || 5).toFixed(2)}`;
       document.documentElement.style.setProperty('--primary', config.primaryColor || '#FF6600');
@@ -455,10 +462,6 @@
         document.getElementById("pergMaionese").checked = config.pergMaionese !== false;
         document.getElementById("pergKetchup").checked = config.pergKetchup !== false;
         document.getElementById("pergGuardanapo").checked = config.pergGuardanapo !== false;
-        
-        if (config.logoImage) {
-          document.getElementById("logoPreview").innerHTML = `<img src="${config.logoImage}">`;
-        }
       }
     }
 
@@ -467,36 +470,12 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
+          // Salva só a info de que tem logo, a imagem fica no navegador
           config.logoImage = e.target.result;
           document.getElementById("logoPreview").innerHTML = `<img src="${config.logoImage}">`;
+          localStorage.setItem("haffeLogoImage", config.logoImage);
         };
         reader.readAsDataURL(file);
-      }
-    }
-
-    async function saveConfig() {
-      config.siteName = document.getElementById("configSiteName").value;
-      config.siteSubtitle = document.getElementById("configSiteSubtitle").value;
-      config.logo = document.getElementById("configLogo").value;
-      config.primaryColor = document.getElementById("configPrimaryColor").value;
-      config.deliveryFee = parseFloat(document.getElementById("configDelivery").value) || 5;
-      config.pergMaionese = document.getElementById("pergMaionese").checked;
-      config.pergKetchup = document.getElementById("pergKetchup").checked;
-      config.pergGuardanapo = document.getElementById("pergGuardanapo").checked;
-
-      try {
-        const response = await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          payload: JSON.stringify({action: "salvarConfig", ...config})
-        });
-        
-        const resultado = await response.json();
-        if (resultado.sucesso) {
-          alert("✅ Configurações salvas!");
-          applyConfig();
-        }
-      } catch(e) {
-        alert("❌ Erro ao salvar: " + e.message);
       }
     }
 
@@ -529,12 +508,16 @@
       const password = document.getElementById("passwordInput").value;
       if (password === ADMIN_PASSWORD) {
         isAdmin = true;
+        editMode = false;
         closeLoginModal();
         document.getElementById("loginBtn").classList.add("hidden");
         document.getElementById("logoutBtn").classList.remove("hidden");
         document.getElementById("editBtn").classList.remove("hidden");
         document.getElementById("configBtn").classList.remove("hidden");
-        loadConfig();
+        document.getElementById("editBtn").onclick = toggleEditMode;
+        loadConfigLocal();
+        applyConfig();
+        renderMenu();
       } else {
         document.getElementById("loginAlert").innerHTML = '<div class="alert error">❌ Errada</div>';
       }
@@ -542,12 +525,18 @@
 
     function logout() {
       isAdmin = false;
+      editMode = false;
       document.getElementById("loginBtn").classList.remove("hidden");
       document.getElementById("logoutBtn").classList.add("hidden");
       document.getElementById("editBtn").classList.add("hidden");
       document.getElementById("configBtn").classList.add("hidden");
       document.getElementById("configPanel").classList.remove("active");
       document.getElementById("cardapioWrapper").style.display = "grid";
+      renderMenu();
+    }
+
+    function toggleEditMode() {
+      editMode = !editMode;
       renderMenu();
     }
 
@@ -612,15 +601,15 @@
       
       section.innerHTML = products.map(p => `
         <div class="product-card">
-          ${isAdmin ? `<div class="product-actions"><button class="btn-edit-product" onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">✏️</button></div>` : ''}
+          ${editMode ? `<div class="product-actions"><button class="btn-edit-product" onclick="openEditModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">✏️</button></div>` : ''}
           <img src="${p.foto || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22180%22%3E%3Crect fill=%22%23FF6600%22 width=%22300%22 height=%22180%22/%3E%3C/svg%3E'}" class="product-img">
-          <div onclick="${isAdmin ? '' : `openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})`}" style="cursor: ${isAdmin ? 'default' : 'pointer'};">
+          <div onclick="${editMode ? '' : `openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})`}" style="cursor: ${editMode ? 'default' : 'pointer'};">
             <div class="product-info">
               <div class="product-name">${p.nome}</div>
               <p style="color: var(--secondary); font-size: 0.85em; margin-bottom: 10px;">${p.descricao}</p>
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span class="product-price">R$ ${p.preco.toFixed(2)}</span>
-                <button class="btn-add" ${isAdmin ? 'style="display:none"' : ''} onclick="event.stopPropagation(); openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">+</button>
+                <button class="btn-add" ${editMode ? 'style="display:none"' : ''} onclick="event.stopPropagation(); openModal(${JSON.stringify(p).replace(/"/g, '&quot;')})">+</button>
               </div>
             </div>
           </div>
@@ -628,12 +617,8 @@
       `).join("");
     }
 
-    function toggleEditMode() {
-      renderMenu();
-    }
-
     function openModal(product) {
-      if (isAdmin) return;
+      if (editMode) return;
       currentProduct = product;
       currentQty = 1;
       selectedAdicionais = {};
@@ -858,14 +843,17 @@
               action: "atualizarProduto",
               id: editingProduct.id,
               nome, descricao, preco, categoria,
-              foto: currentImage || products[index].foto,
+              foto: currentImage ? "tem_imagem" : products[index].foto,
               adicionais: temporaryAdicionais,
               perguntas: { temMeat }
             })
           });
         } catch(e) {
-          console.error("Erro:", e);
+          console.error("Erro ao salvar Apps Script:", e);
         }
+
+        // SALVAR LOCALMENTE TAMBÉM
+        localStorage.setItem("haffeProdutos", JSON.stringify(products));
         
         document.getElementById("editAlert").innerHTML = '<div class="alert success">✅ Salvo!</div>';
         setTimeout(() => {
@@ -1014,7 +1002,7 @@
     }
 
     // ===== INICIALIZAR =====
-    loadConfig();
+    loadConfigLocal();
     loadProducts();
   </script>
 </body>
