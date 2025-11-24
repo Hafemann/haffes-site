@@ -74,7 +74,7 @@
 
 <script>
 // --------- CONFIG ---------
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyfsIHy68PuYYs0OpJG8OsGWtSVrQRg5WS8JbpeVDAJsO5hLGOX0vK8YNkd1JMcaNltag/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuR1ycdChaM-lHbhKf1FW5zkHGrsYNy0HoSGb-t4gYxDp2lhUVuxn2poUQ8tZok1tAvg/exec';
 const ADMIN_PASS = '1234'; // Altere!!
 
 let config = {};
@@ -169,25 +169,21 @@ async function salvarConfig() {
 
 // --------- PRODUTOS ---------
 async function carregarProdutos() {
-  let r = await fetch(APPS_SCRIPT_URL+'?action=getProdutos');
-  produtos = await r.json();
+  try {
+    let r = await fetch(APPS_SCRIPT_URL+'?action=getProdutos');
+    produtos = await r.json();
+    if (!Array.isArray(produtos)) throw "Formato inesperado";
+    if(produtos.length === 0) {
+      document.getElementById("mainMenu").innerHTML = "<div>Nenhum produto cadastrado!</div>";
+      return;
+    }
+  } catch(e) {
+    document.getElementById("mainMenu").innerHTML = "<div style='color:#ff5050'>Erro ao carregar produtos! Cheque a aba Produtos (<b>cabeçalho & dados</b>) e seu Apps Script.</div><pre style='font-size:.9em;color:#aaa'>" + e + "</pre>";
+    produtos = [];
+    return;
+  }
 }
 
-function renderMenu() {
-  let html = `<div class="menu-title">Cardápio</div>`;
-  produtos.forEach(prod => {
-    html += `<div class="card" style="position:relative;">
-      ${admin? `<button class="btn admin-only show" onclick="showEditor('${prod.id}')">Editar</button>` : ""}
-      <img class="prod-img" src="${prod.foto_url || 'https://dummyimage.com/400x200/ff6600/fff.png&text=Sem+Foto'}" alt="foto">
-      <div style="font-size:1.1em;color:var(--primary);font-weight:bold;margin-bottom:2px;">${prod.nome}</div>
-      <div class="small">${prod.descricao || ''}</div>
-      <div style="margin: 9px 0;">R$ <b>${Number(prod.preco).toLocaleString('pt-BR',{minimumFractionDigits:2})}</b></div>
-      ${(prod.adicionais && prod.adicionais.length)? `<div class="small">Adicionais:</div>`:""}
-      ${(prod.adicionais||[]).map(a=> `<div class="adicional">${a.nome} +R$ ${Number(a.preco).toLocaleString('pt-BR')}</div>`).join('')}
-    </div>`;
-  });
-  document.getElementById("mainMenu").innerHTML = html;
-}
 
 // --------- EDITOR DE PRODUTO (EXEMPLO SIMPLES) ---------
 window.showEditor = function(id) {
@@ -286,3 +282,4 @@ function logout() {
 </script>
 </body>
 </html>
+
